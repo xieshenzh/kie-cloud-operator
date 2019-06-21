@@ -10,13 +10,14 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	"github.com/xiezhang7/kie-cloud-operator/pkg/apis"
-	"github.com/xiezhang7/kie-cloud-operator/pkg/controller"
+	"github.com/xiezhang7/kie-cloud-operator1/pkg/apis"
+	"github.com/xiezhang7/kie-cloud-operator1/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
 	"github.com/operator-framework/operator-sdk/pkg/metrics"
+	"github.com/operator-framework/operator-sdk/pkg/restmapper"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 	"github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
@@ -77,7 +78,7 @@ func main() {
 	ctx := context.TODO()
 
 	// Become the leader before proceeding
-	err = leader.Become(ctx, "kie-cloud-operator-lock")
+	err = leader.Become(ctx, "kie-cloud-operator1-lock")
 	if err != nil {
 		log.Error(err, "")
 		os.Exit(1)
@@ -86,6 +87,7 @@ func main() {
 	// Create a new Cmd to provide shared dependencies and start components
 	mgr, err := manager.New(cfg, manager.Options{
 		Namespace:          namespace,
+		MapperProvider:     restmapper.NewDynamicRESTMapper,
 		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
 	})
 	if err != nil {
