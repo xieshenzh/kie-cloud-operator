@@ -10,8 +10,8 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	"github.com/xiezhang7/kie-cloud-operator1/pkg/apis"
-	"github.com/xiezhang7/kie-cloud-operator1/pkg/controller"
+	"github.com/xiezhang7/kie-cloud-operator/pkg/apis"
+	"github.com/xiezhang7/kie-cloud-operator/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
@@ -78,7 +78,7 @@ func main() {
 	ctx := context.TODO()
 
 	// Become the leader before proceeding
-	err = leader.Become(ctx, "kie-cloud-operator1-lock")
+	err = leader.Become(ctx, "kie-cloud-operator-lock")
 	if err != nil {
 		log.Error(err, "")
 		os.Exit(1)

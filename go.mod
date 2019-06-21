@@ -1,4 +1,4 @@
-module github.com/xiezhang7/kie-cloud-operator1
+module github.com/xiezhang7/kie-cloud-operator
 
 require (
 	contrib.go.opencensus.io/exporter/ocagent v0.4.9 // indirect
