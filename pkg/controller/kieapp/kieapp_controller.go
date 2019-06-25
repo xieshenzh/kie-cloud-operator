@@ -4,7 +4,6 @@ import (
 	"context"
 
 	appv1 "github.com/xiezhang7/kie-cloud-operator/pkg/apis/app/v1"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -65,6 +64,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	return nil
 }
 
+// blank assignment to verify that ReconcileKieApp implements reconcile.Reconciler
 var _ reconcile.Reconciler = &ReconcileKieApp{}
 
 // ReconcileKieApp reconciles a KieApp object
