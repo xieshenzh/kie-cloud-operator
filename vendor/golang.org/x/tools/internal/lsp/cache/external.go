@@ -7,7 +7,6 @@ package cache
 import (
 	"context"
 	"io/ioutil"
-	"os"
 
 	"golang.org/x/tools/internal/lsp/source"
 	"golang.org/x/tools/internal/span"
@@ -23,16 +22,13 @@ type nativeFileHandle struct {
 }
 
 func (fs *nativeFileSystem) GetFile(uri span.URI) source.FileHandle {
-	fi, err := os.Stat(uri.Filename())
-	version := fi.ModTime().String()
-	if err != nil {
-		version = "DOES NOT EXIST"
-	}
 	return &nativeFileHandle{
 		fs: fs,
 		identity: source.FileIdentity{
-			URI:     uri,
-			Version: version,
+			URI: uri,
+			// TODO: decide what the version string is for a native file system
+			// could be the mtime?
+			Version: "",
 		},
 	}
 }
@@ -43,11 +39,6 @@ func (h *nativeFileHandle) FileSystem() source.FileSystem {
 
 func (h *nativeFileHandle) Identity() source.FileIdentity {
 	return h.identity
-}
-
-func (h *nativeFileHandle) Kind() source.FileKind {
-	// TODO: How should we determine the file kind?
-	return source.Go
 }
 
 func (h *nativeFileHandle) Read(ctx context.Context) ([]byte, string, error) {

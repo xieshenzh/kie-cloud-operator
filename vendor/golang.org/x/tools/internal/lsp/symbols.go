@@ -19,10 +19,7 @@ func (s *Server) documentSymbol(ctx context.Context, params *protocol.DocumentSy
 	if err != nil {
 		return nil, err
 	}
-	symbols, err := source.DocumentSymbols(ctx, f)
-	if err != nil {
-		return nil, err
-	}
+	symbols := source.DocumentSymbols(ctx, f)
 	return toProtocolDocumentSymbols(m, symbols), nil
 }
 

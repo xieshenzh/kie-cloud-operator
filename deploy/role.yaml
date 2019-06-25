@@ -39,6 +39,14 @@ rules:
   - get
   - create
 - apiGroups:
+  - apps
+  resourceNames:
+  - kie-cloud-operator
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
   - app.kiegroup.org
   resources:
   - '*'

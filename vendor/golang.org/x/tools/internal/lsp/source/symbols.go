@@ -40,15 +40,15 @@ type Symbol struct {
 	Children      []Symbol
 }
 
-func DocumentSymbols(ctx context.Context, f GoFile) ([]Symbol, error) {
+func DocumentSymbols(ctx context.Context, f GoFile) []Symbol {
 	fset := f.FileSet()
 	file := f.GetAST(ctx)
 	if file == nil {
-		return nil, fmt.Errorf("no AST for %s", f.URI())
+		return nil
 	}
 	pkg := f.GetPackage(ctx)
 	if pkg == nil || pkg.IsIllTyped() {
-		return nil, fmt.Errorf("no package for %s", f.URI())
+		return nil
 	}
 	info := pkg.GetTypesInfo()
 	q := qualifier(file, pkg.GetTypes(), info)
@@ -102,7 +102,8 @@ func DocumentSymbols(ctx context.Context, f GoFile) ([]Symbol, error) {
 			symbols = append(symbols, methods...)
 		}
 	}
-	return symbols, nil
+
+	return symbols
 }
 
 func funcSymbol(decl *ast.FuncDecl, obj types.Object, fset *token.FileSet, q types.Qualifier) Symbol {

@@ -42,7 +42,6 @@ type overlay struct {
 	uri     span.URI
 	data    []byte
 	hash    string
-	kind    source.FileKind
 
 	// onDisk is true if a file has been saved on disk,
 	// and therefore does not need to be part of the overlay sent to go/packages.
@@ -265,11 +264,6 @@ func (o *overlay) Identity() source.FileIdentity {
 		URI:     o.uri,
 		Version: o.hash,
 	}
-}
-
-func (o *overlay) Kind() source.FileKind {
-	// TODO: Determine the file kind using textDocument.languageId.
-	return source.Go
 }
 
 func (o *overlay) Read(ctx context.Context) ([]byte, string, error) {

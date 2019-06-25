@@ -6,7 +6,6 @@ package source
 
 import (
 	"context"
-	"fmt"
 	"go/ast"
 	"go/token"
 
@@ -14,20 +13,22 @@ import (
 	"golang.org/x/tools/internal/span"
 )
 
-func Highlight(ctx context.Context, f GoFile, pos token.Pos) ([]span.Span, error) {
+func Highlight(ctx context.Context, f GoFile, pos token.Pos) []span.Span {
 	file := f.GetAST(ctx)
 	if file == nil {
-		return nil, fmt.Errorf("no AST for %s", f.URI())
+		return nil
 	}
 	fset := f.FileSet()
 	path, _ := astutil.PathEnclosingInterval(file, pos, pos)
 	if len(path) == 0 {
-		return nil, fmt.Errorf("no enclosing position found for %s", fset.Position(pos))
+		return nil
 	}
+
 	id, ok := path[0].(*ast.Ident)
 	if !ok {
-		return nil, fmt.Errorf("%s is not an identifier", fset.Position(pos))
+		return nil
 	}
+
 	var result []span.Span
 	if id.Obj != nil {
 		ast.Inspect(path[len(path)-1], func(n ast.Node) bool {
@@ -40,5 +41,5 @@ func Highlight(ctx context.Context, f GoFile, pos token.Pos) ([]span.Span, error
 			return true
 		})
 	}
-	return result, nil
+	return result
 }

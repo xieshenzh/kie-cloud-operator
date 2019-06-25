@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"github.com/xiezhang7/kie-cloud-operator/pkg/apis/app/v1"
+	v1 "github.com/xiezhang7/kie-cloud-operator/pkg/apis/app/v1"
 )
 
 func init() {
