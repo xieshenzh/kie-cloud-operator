@@ -3,47 +3,48 @@ module github.com/kiegroup/kie-cloud-operator
 go 1.12
 
 require (
-	contrib.go.opencensus.io/exporter/ocagent v0.4.9
-	github.com/Azure/go-autorest v11.5.2+incompatible
+	contrib.go.opencensus.io/exporter/ocagent v0.4.9 // indirect
+	github.com/Azure/go-autorest v11.5.2+incompatible // indirect
 	github.com/RHsyseng/console-cr-form v0.0.0-20190614162449-0d455ea16817
 	github.com/RHsyseng/operator-utils v0.0.0-20190616174704-ab479a3d6e3c
-	github.com/appscode/jsonpatch v0.0.0-20190108182946-7c0e3b262f30
-	github.com/coreos/prometheus-operator v0.26.0
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/emicklei/go-restful v2.8.1+incompatible
+	github.com/appscode/jsonpatch v0.0.0-20190108182946-7c0e3b262f30 // indirect
+	github.com/coreos/prometheus-operator v0.26.0 // indirect
+	github.com/evanphx/json-patch v4.1.0+incompatible // indirect
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.1.0
-	github.com/go-logr/zapr v0.1.0
-	github.com/go-openapi/spec v0.18.0
-	github.com/gobuffalo/packr v0.0.0-20190416161152-cda4ac255773
-    github.com/golang/groupcache v0.0.0-20180924190550-6f2cf27854a4
-    github.com/golang/mock v1.2.0
-	github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c
-	github.com/google/uuid v1.0.0
-	github.com/googleapis/gnostic v0.2.0
-	github.com/gophercloud/gophercloud v0.0.0-20190318015731-ff9851476e98
-	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7
-	github.com/grpc-ecosystem/grpc-gateway v1.8.5
-	github.com/imdario/mergo v0.3.6
+	github.com/go-logr/zapr v0.1.0 // indirect
+	github.com/go-openapi/spec v0.19.0
+	github.com/go-openapi/validate v0.18.0 // indirect
+	github.com/gobuffalo/packr v0.0.0-20190416161152-cda4ac255773 // indirect
+	github.com/gobuffalo/packr/v2 v2.1.0
+	github.com/google/go-cmp v0.2.0
+	github.com/googleapis/gnostic v0.2.0 // indirect
+	github.com/gophercloud/gophercloud v0.0.0-20190318015731-ff9851476e98 // indirect
+	github.com/imdario/mergo v0.3.7
+	github.com/openshift/api v3.9.1-0.20190424152011-77b8897ec79a+incompatible
+	github.com/openshift/client-go v0.0.0-20190401163519-84c2b942258a
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20190605231540-b8a4faf68e36
 	github.com/operator-framework/operator-sdk v0.8.2-0.20190522220659-031d71ef8154
 	github.com/pavel-v-chernykh/keystore-go v2.1.0+incompatible
-	github.com/pborman/uuid v0.0.0-20180906182336-adf5a7427709
-	github.com/peterbourgon/diskv v2.0.1+incompatible
+	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
+	github.com/pkg/errors v0.8.1
+	github.com/prometheus/common v0.2.0
 	github.com/spf13/pflag v1.0.3
-	go.opencensus.io v0.19.2
-	go.uber.org/atomic v1.3.2
-	go.uber.org/multierr v1.1.0
-	go.uber.org/zap v1.9.1
-    golang.org/x/sync v0.0.0-20190423024810-112230192c58
-	golang.org/x/time v0.0.0-20180412165947-fbb02b2291d2
-	k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
-	k8s.io/client-go v2.0.0-alpha.0.0.20181126152608-d082d5923d3c+incompatible
-	k8s.io/code-generator v0.0.0-20180823001027-3dcf91f64f63
-	k8s.io/gengo v0.0.0-20190128074634-0689ccc1d7d6
-	k8s.io/kube-openapi v0.0.0-20180711000925-0cf8f7e6ed1d
+	github.com/stretchr/testify v1.3.0
+	go.opencensus.io v0.19.2 // indirect
+	go.uber.org/multierr v1.1.0 // indirect
+	go.uber.org/zap v1.10.0
+	golang.org/x/sync v0.0.0-20190423024810-112230192c58 // indirect
+	k8s.io/api v0.0.0-20190313235455-40a48860b5ab
+	k8s.io/apiextensions-apiserver v0.0.0-20190315093550-53c4693659ed
+	k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d
+	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/code-generator v0.0.0-20190311093542-50b561225d70
+	k8s.io/gengo v0.0.0-20190327210449-e17681d19d3a
+	k8s.io/kube-openapi v0.0.0-20190401085232-94e1e7b7574c
 	sigs.k8s.io/controller-runtime v0.1.10
 	sigs.k8s.io/controller-tools v0.1.10
-	sigs.k8s.io/testing_frameworks v0.1.0
+	sigs.k8s.io/testing_frameworks v0.1.0 // indirect
 )
 
 // Pinned to kubernetes-1.13.1
