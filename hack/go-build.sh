@@ -8,6 +8,11 @@ TAR=${BRANCH}.tar.gz
 URL=${REPO}/archive/${TAR}
 CFLAGS="docker"
 
+echo
+echo Set GO111MODULE=on
+echo
+export GO111MODULE=on
+
 go generate ./...
 if [[ -z ${CI} ]]; then
     ./hack/go-test.sh
