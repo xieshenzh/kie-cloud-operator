@@ -15,14 +15,13 @@ require (
 	github.com/go-logr/zapr v0.1.0 // indirect
 	github.com/go-openapi/spec v0.19.0
 	github.com/go-openapi/validate v0.18.0 // indirect
-	github.com/gobuffalo/packr v0.0.0-20190416161152-cda4ac255773 // indirect
-	github.com/gobuffalo/packr/v2 v2.1.0
+	github.com/gobuffalo/packr/v2 v2.2.0
 	github.com/google/go-cmp v0.2.0
 	github.com/googleapis/gnostic v0.2.0 // indirect
 	github.com/gophercloud/gophercloud v0.0.0-20190318015731-ff9851476e98 // indirect
 	github.com/imdario/mergo v0.3.7
 	github.com/openshift/api v3.9.1-0.20190424152011-77b8897ec79a+incompatible
-	github.com/openshift/client-go v0.0.0-20190401163519-84c2b942258a
+	github.com/openshift/client-go v3.9.0+incompatible
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20190605231540-b8a4faf68e36
 	github.com/operator-framework/operator-sdk v0.8.2-0.20190522220659-031d71ef8154
 	github.com/pavel-v-chernykh/keystore-go v2.1.0+incompatible
@@ -62,4 +61,9 @@ replace (
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20180711000925-0cf8f7e6ed1d
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.1.10
 	sigs.k8s.io/controller-tools => sigs.k8s.io/controller-tools v0.1.11-0.20190411181648-9d55346c2bde
+)
+
+replace (
+	github.com/openshift/api => github.com/openshift/api v3.9.0+incompatible
+	github.com/openshift/client-go => github.com/openshift/client-go v3.9.0+incompatible
 )
