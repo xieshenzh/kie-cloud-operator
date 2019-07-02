@@ -18,20 +18,16 @@ endif
 .PHONY: all
 all: build
 
-.PHONY: mod
-mod:
-	./hack/go-mod.sh
-
 .PHONY: format
 format:
 	./hack/go-fmt.sh
 
 .PHONY: go-generate
-go-generate: mod
+go-generate:
 	$(Q)go generate ./...
 
 .PHONY: sdk-generate
-sdk-generate: mod
+sdk-generate:
 	operator-sdk generate k8s
 
 .PHONY: vet
@@ -63,6 +59,10 @@ rhel-scratch:
 .PHONY: rhel-release
 rhel-release:
 	./hack/go-build.sh rhel release
+
+.PHONY: mod-tidy
+mod-tidy:
+	./hack/go-mod-tidy.sh
 
 .PHONY: clean
 clean:

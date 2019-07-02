@@ -5,7 +5,7 @@
 ## Requirements
 
 - go v1.12+
-- operator-sdk v0.8.1
+- operator-sdk v0.9.0
 
 ## Build
 
@@ -62,7 +62,6 @@ oc delete kieapp rhpam-trial
 Change log level at runtime w/ the `DEBUG` environment variable. e.g. -
 
 ```bash
-make dep
 make clean
 DEBUG="true" operator-sdk up local --namespace=<namespace>
 ```
