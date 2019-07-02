@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/xiezhang7/kie-cloud-operator/pkg/controller/kieapp"
+	"github.com/kiegroup/kie-cloud-operator/pkg/controller/kieapp"
 )
 
 func init() {
