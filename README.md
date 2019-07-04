@@ -62,6 +62,7 @@ oc delete kieapp rhpam-trial
 Change log level at runtime w/ the `DEBUG` environment variable. e.g. -
 
 ```bash
+make mod
 make clean
 DEBUG="true" operator-sdk up local --namespace=<namespace>
 ```

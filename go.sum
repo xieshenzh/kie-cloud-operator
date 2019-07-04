@@ -167,7 +167,6 @@ github.com/golang/glog v0.0.0-20141105023935-44145f04b68c/go.mod h1:SBH7ygxi8pfU
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b h1:VKtxabqXZkF25pY9ekfRL6a582T4P37/31XEstQ5p58=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/groupcache v0.0.0-20180924190550-6f2cf27854a4/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
-github.com/golang/groupcache v0.0.0-20181024230925-c65c006176ff h1:kOkM9whyQYodu09SJ6W3NCsHG7crFaJILQ22Gozp3lg=
 github.com/golang/groupcache v0.0.0-20181024230925-c65c006176ff/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
 github.com/golang/groupcache v0.0.0-20190129154638-5b532d6fd5ef h1:veQD95Isof8w9/WXiA+pa3tz3fJXkt5B7QaRBrM62gk=
 github.com/golang/groupcache v0.0.0-20190129154638-5b532d6fd5ef/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
@@ -302,8 +301,8 @@ github.com/operator-framework/operator-marketplace v0.0.0-20190216021216-57300a3
 github.com/operator-framework/operator-registry v1.0.1/go.mod h1:1xEdZjjUg2hPEd52LG3YQ0jtwiwEGdm98S1TH5P4RAA=
 github.com/operator-framework/operator-registry v1.0.4/go.mod h1:hve6YwcjM2nGVlscLtNsp9sIIBkNZo6jlJgzWw7vP9s=
 github.com/operator-framework/operator-registry v1.1.1/go.mod h1:7D4WEwL+EKti5npUh4/u64DQhawCBRugp8Ql20duUb4=
-github.com/operator-framework/operator-sdk v0.8.1-0.20190702014714-5507e00a6d5f h1:Ds3oA++Xif3kcMBV+PU9OSPEk4EkaMZr9p6sNmomjfw=
-github.com/operator-framework/operator-sdk v0.8.1-0.20190702014714-5507e00a6d5f/go.mod h1:iVyukRkam5JZa8AnjYf+/G3rk7JI1+M6GsU0sq0B9NA=
+github.com/operator-framework/operator-sdk v0.8.1-0.20190702165559-d6903be02d4e h1:n8jG0mBXg47ESbT1n3L88fB7T1kuJQsN7lx7xrlmjq8=
+github.com/operator-framework/operator-sdk v0.8.1-0.20190702165559-d6903be02d4e/go.mod h1:iVyukRkam5JZa8AnjYf+/G3rk7JI1+M6GsU0sq0B9NA=
 github.com/pavel-v-chernykh/keystore-go v2.1.0+incompatible h1:Jd6xfriVlJ6hWPvYOE0Ni0QWcNTLRehfGPFxr3eSL80=
 github.com/pavel-v-chernykh/keystore-go v2.1.0+incompatible/go.mod h1:xlUlxe/2ItGlQyMTstqeDv9r3U4obH7xYd26TbDQutY=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=

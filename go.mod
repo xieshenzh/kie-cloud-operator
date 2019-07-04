@@ -22,7 +22,7 @@ require (
 	github.com/openshift/api v3.9.1-0.20190424152011-77b8897ec79a+incompatible
 	github.com/openshift/client-go v3.9.0+incompatible
 	github.com/operator-framework/operator-lifecycle-manager v0.0.0-20190605231540-b8a4faf68e36
-	github.com/operator-framework/operator-sdk v0.8.1-0.20190702014714-5507e00a6d5f
+	github.com/operator-framework/operator-sdk v0.8.1-0.20190702165559-d6903be02d4e
 	github.com/pavel-v-chernykh/keystore-go v2.1.0+incompatible
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.8.1
