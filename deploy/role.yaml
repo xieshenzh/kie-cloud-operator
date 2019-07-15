@@ -1,7 +1,6 @@
-apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  creationTimestamp: null
   name: kie-cloud-operator
 rules:
 - apiGroups:
@@ -15,7 +14,7 @@ rules:
   - configmaps
   - secrets
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - apps
   resources:
@@ -24,22 +23,22 @@ rules:
   - replicasets
   - statefulsets
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - monitoring.coreos.com
   resources:
   - servicemonitors
   verbs:
-  - get
-  - create
+  - "get"
+  - "create"
 - apiGroups:
   - apps
-  resourceNames:
-  - kie-cloud-operator
   resources:
   - deployments/finalizers
+  resourceNames:
+  - kie-cloud-operator
   verbs:
-  - update
+  - "update"
 - apiGroups:
   - ""
   resources:
@@ -52,9 +51,3 @@ rules:
   - replicasets
   verbs:
   - get
-- apiGroups:
-  - app.kiegroup.org
-  resources:
-  - '*'
-  verbs:
-  - '*'
