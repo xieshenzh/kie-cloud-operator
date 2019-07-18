@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kie-cloud-operator-metrics
+  labels:
+    name: kie-cloud-operator
+spec:
+  selector:
+    matchLabels:
+      name: kie-cloud-operator
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+    - port: cr-metrics
+      interval: 30s
