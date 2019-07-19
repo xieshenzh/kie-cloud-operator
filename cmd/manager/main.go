@@ -134,9 +134,13 @@ func main() {
 		{Port: operatorMetricsPort, Name: metrics.CRPortName, Protocol: v1.ProtocolTCP, TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: operatorMetricsPort}},
 	}
 	// Create Service object to expose the metrics port(s).
-	_, err = metrics.CreateMetricsService(ctx, cfg, servicePorts)
+	metricsService, err := metrics.CreateMetricsService(ctx, cfg, servicePorts)
 	if err != nil {
 		log.Info("Error exposing metrics. ", err)
+	}
+	err = createMetricsServiceMonitor(metricsService, cfg)
+	if err != nil {
+		log.Info("Error creating service monitor for exposing metrics. ", err)
 	}
 
 	log.Info("Starting the Operator.")
@@ -177,5 +181,25 @@ func serveCRMetrics(cfg *rest.Config) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func createMetricsServiceMonitor(metricsService *v1.Service, cfg *rest.Config) error {
+	// Populate below with the Service(s) for which you want to create ServiceMonitors.
+	services := []*v1.Service{metricsService}
+
+	// Create one `ServiceMonitor` per application per namespace.
+	// Change below value to name of the Namespace you want the `ServiceMonitor` to be created in.
+	ns, err := k8sutil.GetOperatorNamespace()
+	if err != nil {
+		return err
+	}
+
+	// Pass the Service(s) to the helper function, which in turn returns the array of `ServiceMonitor` objects.
+	_, err = metrics.CreateServiceMonitors(cfg, ns, services)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
