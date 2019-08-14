@@ -1,4 +1,7 @@
 #!/bin/sh
+
+. ./hack/go-mod-env.sh
+
 REPO=https://github.com/kiegroup/kie-cloud-operator
 BRANCH=1.2.0
 REGISTRY=quay.io/kiegroup
@@ -7,6 +10,8 @@ TAG=1.2
 TAR=${BRANCH}.tar.gz
 URL=${REPO}/archive/${TAR}
 CFLAGS="docker"
+
+setGoModEnv
 
 go generate ./...
 if [[ -z ${CI} ]]; then

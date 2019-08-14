@@ -64,10 +64,6 @@ rhel-scratch:
 rhel-release:
 	./hack/go-build.sh rhel release
 
-.PHONY: mod-tidy
-mod-tidy:
-	./hack/go-mod-tidy.sh
-
 .PHONY: clean
 clean:
 	rm -rf build/_output \

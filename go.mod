@@ -4,8 +4,8 @@ go 1.12
 
 require (
 	github.com/NYTimes/gziphandler v1.0.1 // indirect
-	github.com/RHsyseng/console-cr-form v0.0.0-20190614162449-0d455ea16817
-	github.com/RHsyseng/operator-utils v0.0.0-20190703170907-ea948e9684cd
+	github.com/RHsyseng/console-cr-form v0.0.0-20190813183526-9e2fe4f5e946
+	github.com/RHsyseng/operator-utils v0.0.0-20190807020041-5344a0f594b8
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.1.0
 	github.com/go-openapi/spec v0.19.0
