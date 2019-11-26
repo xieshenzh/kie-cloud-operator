@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -2858,4 +2859,515 @@ func checkImageNames(cr *api.KieApp, imageName, imageURL string, t *testing.T) {
 	assert.Equal(t, imageURL, env.Servers[0].DeploymentConfigs[0].Spec.Template.Spec.Containers[0].Image)
 	assert.Equal(t, imageURL, env.Servers[1].DeploymentConfigs[0].Spec.Template.Spec.Containers[0].Image)
 	assert.Equal(t, imageURL, env.SmartRouter.DeploymentConfigs[0].Spec.Template.Spec.Containers[0].Image)
+}
+
+func TestDeployPIM(t *testing.T) {
+	type args struct {
+		cr *api.KieApp
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			"RhpamTrial",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamTrial,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"RhpamProduction",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamProduction,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"RhpamProductionImmutable",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamProductionImmutable,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"RhpamAuthoring",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamAuthoring,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"RhpamAuthoringHA",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamAuthoringHA,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"RhdmTrial",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhdmTrial,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhdmProductionImmutable",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhdmProductionImmutable,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhdmAuthoring",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhdmAuthoring,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhdmAuthoringHA",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhdmAuthoringHA,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhpamTrial_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamTrial,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhpamProduction_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamProduction,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhpamProductionImmutable_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamProductionImmutable,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhpamAuthoring_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamAuthoring,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhpamAuthoringHA_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamAuthoringHA,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhdmTrial_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhdmTrial,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhdmProductionImmutable_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhdmProductionImmutable,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhdmAuthoring_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhdmAuthoring,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"RhdmAuthoringHA_NoPIM",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhdmAuthoringHA,
+					},
+				},
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := deployPIM(tt.args.cr); got != tt.want {
+				t.Errorf("deployPIM() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetPIMTemplate(t *testing.T) {
+	type args struct {
+		cr            *api.KieApp
+		serversConfig []api.ServerTemplate
+	}
+	tests := []struct {
+		name string
+		args args
+		want api.PIMTemplate
+	}{
+		{
+			"PIM_Custom",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamTrial,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{
+								KieAppObject: api.KieAppObject{
+									Image:    "test-pim-image",
+									ImageTag: "test-pim-image-tag",
+								},
+								Database: api.DatabaseObject{
+									Type: api.DatabaseMySQL,
+								},
+							},
+						},
+						CommonConfig: api.CommonConfig{
+							ImageTag:      "test",
+							AdminUser:     "testuser",
+							AdminPassword: "testpassword",
+						},
+					},
+				},
+				[]api.ServerTemplate{
+					{KieName: "kieserver1"},
+					{KieName: "kieserver2"},
+				},
+			},
+			api.PIMTemplate{
+				Image:    "test-pim-image",
+				ImageTag: "test-pim-image-tag",
+				KieServers: []api.KieServer{
+					{
+						Host:     "http://kieserver1:8080/services/rest/server",
+						Username: "testuser",
+						Password: "testpassword",
+					},
+					{
+						Host:     "http://kieserver2:8080/services/rest/server",
+						Username: "testuser",
+						Password: "testpassword",
+					},
+				},
+				Database: api.DatabaseObject{
+					Type: api.DatabaseMySQL,
+				},
+			},
+		},
+		{
+			"PIM_Default",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamTrial,
+						Objects: api.KieAppObjects{
+							PIM: &api.PIMObject{},
+						},
+						CommonConfig: api.CommonConfig{
+							ImageTag:      "test",
+							AdminUser:     "testuser",
+							AdminPassword: "testpassword",
+						},
+					},
+				},
+				[]api.ServerTemplate{
+					{KieName: "kieserver1"},
+				},
+			},
+			api.PIMTemplate{
+				Image:    "rhpam-process-migration-rhel8",
+				ImageTag: "test",
+				KieServers: []api.KieServer{
+					{
+						Host:     "http://kieserver1:8080/services/rest/server",
+						Username: "testuser",
+						Password: "testpassword",
+					},
+				},
+				Database: api.DatabaseObject{
+					Type: api.DatabaseH2,
+				},
+			},
+		},
+		{
+			"PIM_Empty",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamTrial,
+						CommonConfig: api.CommonConfig{
+							ImageTag:      "test",
+							AdminUser:     "testuser",
+							AdminPassword: "testpassword",
+						},
+					},
+				},
+				[]api.ServerTemplate{
+					{KieName: "kieserver1"},
+				},
+			},
+			api.PIMTemplate{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getPIMTemplate(tt.args.cr, tt.args.serversConfig); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getPIMTemplate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMergePIMDB(t *testing.T) {
+	type args struct {
+		service     api.PlatformService
+		cr          *api.KieApp
+		env         api.Environment
+		envTemplate api.EnvTemplate
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    api.Environment
+		wantDB  string
+		wantErr bool
+	}{
+		{
+			"PIM_ExternalDB",
+			args{
+				test.MockService(),
+				&api.KieApp{},
+				api.Environment{},
+				api.EnvTemplate{
+					PIM: api.PIMTemplate{
+						Database: api.DatabaseObject{
+							Type: api.DatabaseExternal,
+						},
+					},
+				},
+			},
+			api.Environment{},
+			"",
+			true,
+		},
+		{
+			"PIM_H2",
+			args{
+				test.MockService(),
+				&api.KieApp{},
+				api.Environment{},
+				api.EnvTemplate{
+					PIM: api.PIMTemplate{
+						Database: api.DatabaseObject{
+							Type: api.DatabaseH2,
+						},
+					},
+				},
+			},
+			api.Environment{},
+			"",
+			false,
+		},
+		{
+			"PIM_MySQL",
+			args{
+				test.MockService(),
+				&api.KieApp{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "test",
+						Namespace: "test-ns",
+					},
+					Spec: api.KieAppSpec{
+						Version: constants.CurrentVersion,
+					},
+				},
+				api.Environment{},
+				api.EnvTemplate{
+					CommonConfig: &api.CommonConfig{
+						ApplicationName: "kietest",
+					},
+					PIM: api.PIMTemplate{
+						Database: api.DatabaseObject{
+							Type: api.DatabaseMySQL,
+						},
+					},
+				},
+			},
+			api.Environment{},
+			"mysql",
+			false,
+		},
+		{
+			"PIM_POSTGRESSQL",
+			args{
+				test.MockService(),
+				&api.KieApp{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "test",
+						Namespace: "test-ns",
+					},
+					Spec: api.KieAppSpec{
+						Version: constants.CurrentVersion,
+					},
+				},
+				api.Environment{},
+				api.EnvTemplate{
+					CommonConfig: &api.CommonConfig{
+						ApplicationName: "kietest",
+					},
+					PIM: api.PIMTemplate{
+						Database: api.DatabaseObject{
+							Type: api.DatabasePostgreSQL,
+						},
+					},
+				},
+			},
+			api.Environment{},
+			"postgresql",
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := mergePIMDB(tt.args.service, tt.args.cr, tt.args.env, tt.args.envTemplate)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("mergePIMDB() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				if got.PIM.DeploymentConfigs == nil || len(got.PIM.DeploymentConfigs) == 0 {
+					t.Errorf("mergePIMDB() got = %v, want %v", got, tt.want)
+				}
+
+				if got.PIM.Services == nil || len(got.PIM.Services) == 0 {
+					t.Errorf("mergePIMDB() got = %v, want %v", got, tt.want)
+				}
+
+				for _, dc := range got.PIM.DeploymentConfigs {
+					if strings.Contains(dc.Name, tt.wantDB) {
+						goto services
+					}
+				}
+				t.Errorf("mergePIMDB() got = %v, want %v", got, tt.want)
+
+			services:
+				for _, svc := range got.PIM.Services {
+					if strings.Contains(svc.Name, tt.wantDB) {
+						return
+					}
+				}
+				t.Errorf("mergePIMDB() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

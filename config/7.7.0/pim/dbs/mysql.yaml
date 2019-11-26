@@ -1,0 +1,132 @@
+## KIE PIM BEGIN
+pim:
+  ## KIE PIM deployment config BEGIN
+  deploymentConfigs:
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration"
+      spec:
+        template:
+          spec:
+            initContainers:
+              - command:
+                  [
+                    "sh",
+                    "-c",
+                    "until nslookup [[.ApplicationName]]-process-migration-mysql && nc -vz [[.ApplicationName]]-process-migration-mysql 3306; do echo waiting for [[.ApplicationName]]-process-migration-mysql; sleep 2; done;",
+                  ]
+                image: busybox
+                imagePullPolicy: IfNotPresent
+                name: "[[.ApplicationName]]-process-migration-mysql-init"
+                terminationMessagePolicy: FallbackToLogsOnError
+    ## KIE PIM deployment config END
+    ## MySQL deployment BEGIN
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration-mysql"
+        labels:
+          app: "[[$.ApplicationName]]"
+          application: "[[$.ApplicationName]]"
+          service: "[[.ApplicationName]]-process-migration-mysql"
+      spec:
+        strategy:
+          type: Recreate
+        triggers:
+          - type: ImageChange
+            imageChangeParams:
+              automatic: true
+              containerNames:
+                - "[[.ApplicationName]]-process-migration-mysql"
+              from:
+                kind: ImageStreamTag
+                namespace: "openshift"
+                name: "mysql:5.7"
+          - type: ConfigChange
+        replicas: 1
+        selector:
+          deploymentConfig: "[[.ApplicationName]]-process-migration-mysql"
+        template:
+          metadata:
+            name: "[[.ApplicationName]]-process-migration-mysql"
+            labels:
+              deploymentConfig: "[[.ApplicationName]]-process-migration-mysql"
+              app: "[[$.ApplicationName]]"
+              application: "[[$.ApplicationName]]"
+              service: "[[.ApplicationName]]-process-migration-mysql"
+          spec:
+            terminationGracePeriodSeconds: 60
+            containers:
+              - name: "[[.ApplicationName]]-process-migration-mysql"
+                image: mysql
+                imagePullPolicy: Always
+                livenessProbe:
+                  tcpSocket:
+                    port: 3306
+                  initialDelaySeconds: 30
+                  timeoutSeconds: 1
+                readinessProbe:
+                  exec:
+                    command:
+                      - "/bin/sh"
+                      - "-i"
+                      - "-c"
+                      - "MYSQL_PWD=$MYSQL_PASSWORD mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'"
+                    port: 3306
+                  initialDelaySeconds: 5
+                  timeoutSeconds: 1
+                ports:
+                  - containerPort: 3306
+                    protocol: TCP
+                env:
+                  - name: MYSQL_USER
+                    value: "pim"
+                  - name: MYSQL_PASSWORD
+                    value: "[[$.DBPassword]]"
+                  - name: MYSQL_DATABASE
+                    value: "pimdb"
+                volumeMounts:
+                  - mountPath: "/var/lib/mysql/data"
+                    name: "[[.ApplicationName]]-process-migration-mysql-[[$.Constants.DatabaseVolumeSuffix]]"
+            ##[[ if ne .PIM.Database.Size "" ]]
+            volumes:
+              - name: "[[.ApplicationName]]-process-migration-mysql-[[$.Constants.DatabaseVolumeSuffix]]"
+                persistentVolumeClaim:
+                  claimName: "[[.ApplicationName]]-process-migration-mysql-claim"
+  ## MySQL deployment END
+  ## MySQL persistent volume claim BEGIN
+  persistentVolumeClaims:
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration-mysql-claim"
+        labels:
+          app: "[[$.ApplicationName]]"
+          application: "[[$.ApplicationName]]"
+          service: "[[.ApplicationName]]-process-migration-mysql"
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "[[.PIM.Database.Size]]"
+            ## MySQL persistent volume claim END
+            ##[[ else ]]
+            volumes:
+              - name: "[[.ApplicationName]]-process-migration-mysql-[[$.Constants.DatabaseVolumeSuffix]]"
+                emptyDir: {}
+  ##[[ end ]]
+  ## MySQL persistent volume claim END
+  ## MySQL service BEGIN
+  services:
+    - spec:
+        ports:
+          - port: 3306
+            targetPort: 3306
+        selector:
+          deploymentConfig: "[[.ApplicationName]]-process-migration-mysql"
+      metadata:
+        name: "[[.ApplicationName]]-process-migration-mysql"
+        labels:
+          app: "[[$.ApplicationName]]"
+          application: "[[$.ApplicationName]]"
+          service: "[[.ApplicationName]]-process-migration-mysql"
+        annotations:
+          description: The MySQL server's port.
+  ## MySQL service END
+## KIE PIM END

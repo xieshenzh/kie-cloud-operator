@@ -476,6 +476,28 @@ func TestMergeDeploymentconfigs_PodSpec_Volumes(t *testing.T) {
 	assert.Equal(t, "/etc/kieserver/dc1/path2", results[0].Spec.Template.Spec.Containers[0].VolumeMounts[1].MountPath)
 }
 
+func TestMergeConfigMaps(t *testing.T) {
+	baseline := []corev1.ConfigMap{
+		*buildCM("cm1",
+			map[string]string{"cm1-data-key": "cm1-data-value"},
+			map[string][]byte{"cm1-binary-data-key": {1, 2, 3, 4, 5}}),
+	}
+
+	overwrite := []corev1.ConfigMap{
+		*buildCM("overwrite-cm2",
+			map[string]string{"cm2-data-key": "cm2-data-value"},
+			map[string][]byte{"cm2-binary-data-key": {1, 3, 5, 7, 9}}),
+		*buildCM("cm1",
+			map[string]string{"cm1-data-key": "cm1-data-value-overwrite"},
+			map[string][]byte{"cm1-binary-data-key": {6, 7, 8, 9, 0}}),
+	}
+	results := mergeConfigMaps(baseline, overwrite)
+
+	assert.Equal(t, 2, len(results))
+	assert.Equal(t, overwrite[0], results[1])
+	assert.Equal(t, overwrite[1], results[0])
+}
+
 func getParsedTemplate(filename string, name string, object interface{}) error {
 	cr := &api.KieApp{
 		ObjectMeta: metav1.ObjectMeta{
@@ -644,5 +666,13 @@ func buildProbe(name string, delay, timeout int32) *corev1.Probe {
 		},
 		InitialDelaySeconds: delay,
 		TimeoutSeconds:      timeout,
+	}
+}
+
+func buildCM(name string, data map[string]string, binaryData map[string][]byte) *corev1.ConfigMap {
+	return &corev1.ConfigMap{
+		ObjectMeta: *buildObjectMeta(name + "-cm"),
+		Data:       data,
+		BinaryData: binaryData,
 	}
 }

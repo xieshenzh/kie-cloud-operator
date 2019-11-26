@@ -284,6 +284,24 @@ func getComparator() compare.MapComparator {
 		return defaultSecretComparator(secret1, secret2)
 	})
 
+	configMapType := reflect.TypeOf(corev1.ConfigMap{})
+	resourceComparator.SetComparator(configMapType, func(deployed resource.KubernetesResource, requested resource.KubernetesResource) bool {
+		configMap1 := deployed.(*corev1.ConfigMap)
+		configMap2 := requested.(*corev1.ConfigMap)
+		var pairs [][2]interface{}
+		pairs = append(pairs, [2]interface{}{configMap1.Name, configMap2.Name})
+		pairs = append(pairs, [2]interface{}{configMap1.Namespace, configMap2.Namespace})
+		pairs = append(pairs, [2]interface{}{configMap1.Labels, configMap2.Labels})
+		pairs = append(pairs, [2]interface{}{configMap1.Annotations, configMap2.Annotations})
+		pairs = append(pairs, [2]interface{}{configMap1.Data, configMap2.Data})
+		pairs = append(pairs, [2]interface{}{configMap1.BinaryData, configMap2.BinaryData})
+		equal := compare.EqualPairs(pairs)
+		if !equal {
+			log.Info("Resources are not equal", "deployed", deployed, "requested", requested)
+		}
+		return equal
+	})
+
 	return compare.MapComparator{Comparator: resourceComparator}
 }
 
@@ -582,6 +600,7 @@ func getCustomObjects(env api.Environment) []api.CustomObject {
 	objects = append(objects, env.Console)
 	objects = append(objects, env.Servers...)
 	objects = append(objects, env.SmartRouter)
+	objects = append(objects, env.PIM)
 	objects = append(objects, env.Others...)
 	return objects
 }
@@ -678,6 +697,10 @@ func (reconciler *Reconciler) getCustomObjectResources(object api.CustomObject, 
 			)
 		}
 		allObjects = append(allObjects, &object.BuildConfigs[index])
+	}
+	for index := range object.ConfigMaps {
+		object.ConfigMaps[index].SetGroupVersionKind(corev1.SchemeGroupVersion.WithKind("ConfigMap"))
+		allObjects = append(allObjects, &object.ConfigMaps[index])
 	}
 	return allObjects
 }
@@ -878,6 +901,7 @@ func (reconciler *Reconciler) getDeployedResources(instance *api.KieApp) (map[re
 		&routev1.RouteList{},
 		&oimagev1.ImageStreamList{},
 		&buildv1.BuildConfigList{},
+		&corev1.ConfigMapList{},
 	)
 	if err != nil {
 		log.Warn("Failed to list deployed objects. ", err)

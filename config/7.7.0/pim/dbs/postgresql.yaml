@@ -1,0 +1,133 @@
+## KIE PIM BEGIN
+pim:
+  ## KIE PIM deployment config BEGIN
+  deploymentConfigs:
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration"
+      spec:
+        template:
+          spec:
+            initContainers:
+              - command:
+                  [
+                    "sh",
+                    "-c",
+                    "until nslookup [[.ApplicationName]]-process-migration-postgresql && nc -vz [[.ApplicationName]]-process-migration-postgresql 5432; do echo waiting for [[.ApplicationName]]-process-migration-postgresql; sleep 2; done;",
+                  ]
+                image: busybox
+                imagePullPolicy: IfNotPresent
+                name: "[[.ApplicationName]]-process-migration-postgresql-init"
+                terminationMessagePolicy: FallbackToLogsOnError
+    ## KIE PIM deployment config END
+    ## PostgreSQL deployment config BEGIN
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration-postgresql"
+        labels:
+          app: "[[$.ApplicationName]]"
+          application: "[[$.ApplicationName]]"
+          service: "[[.ApplicationName]]-process-migration-postgresql"
+      spec:
+        strategy:
+          rollingParams:
+            maxSurge: 100%
+            maxUnavailable: 0
+          type: Rolling
+        triggers:
+          - type: ImageChange
+            imageChangeParams:
+              automatic: true
+              containerNames:
+                - "[[.ApplicationName]]-process-migration-postgresql"
+              from:
+                kind: ImageStreamTag
+                namespace: "openshift"
+                name: "postgresql:10"
+          - type: ConfigChange
+        replicas: 1
+        selector:
+          deploymentConfig: "[[.ApplicationName]]-process-migration-postgresql"
+        template:
+          metadata:
+            name: "[[.ApplicationName]]-process-migration-postgresql"
+            labels:
+              deploymentConfig: "[[.ApplicationName]]-process-migration-postgresql"
+              app: "[[$.ApplicationName]]"
+              application: "[[$.ApplicationName]]"
+              service: "[[.ApplicationName]]-process-migration-postgresql"
+          spec:
+            containers:
+              - name: "[[.ApplicationName]]-process-migration-postgresql"
+                image: postgresql
+                imagePullPolicy: IfNotPresent
+                livenessProbe:
+                  exec:
+                    command:
+                      - "/usr/libexec/check-container"
+                      - "--live"
+                  initialDelaySeconds: 120
+                  timeoutSeconds: 10
+                readinessProbe:
+                  exec:
+                    command:
+                      - "/usr/libexec/check-container"
+                  initialDelaySeconds: 5
+                  timeoutSeconds: 1
+                ports:
+                  - containerPort: 5432
+                    protocol: TCP
+                env:
+                  - name: POSTGRESQL_USER
+                    value: "pim"
+                  - name: POSTGRESQL_PASSWORD
+                    value: "[[$.DBPassword]]"
+                  - name: POSTGRESQL_DATABASE
+                    value: "pimdb"
+                  - name: POSTGRESQL_MAX_PREPARED_TRANSACTIONS
+                    value: "100"
+                volumeMounts:
+                  - mountPath: "/var/lib/pgsql/data"
+                    name: "[[.ApplicationName]]-process-migration-postgresql-[[$.Constants.DatabaseVolumeSuffix]]"
+            ##[[ if ne .PIM.Database.Size "" ]]
+            volumes:
+              - name: "[[.ApplicationName]]-process-migration-postgresql-[[$.Constants.DatabaseVolumeSuffix]]"
+                persistentVolumeClaim:
+                  claimName: "[[.ApplicationName]]-process-migration-postgresql-claim"
+  ## PostgreSQL deployment config END
+  ## PostgreSQL persistent volume claim BEGIN
+  persistentVolumeClaims:
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration-postgresql-claim"
+        labels:
+          app: "[[$.ApplicationName]]"
+          application: "[[$.ApplicationName]]"
+          service: "[[.ApplicationName]]-process-migration-postgresql"
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "[[.PIM.Database.Size]]"
+            ## PostgreSQL persistent volume claim END
+            ##[[ else ]]
+            volumes:
+              - name: "[[.ApplicationName]]-process-migration-postgresql-[[$.Constants.DatabaseVolumeSuffix]]"
+                emptyDir: {}
+  ##[[ end ]]
+  ## PostgreSQL persistent volume claim END
+  ## PostgreSQL service BEGIN
+  services:
+    - metadata:
+        annotations:
+          description: The database server's port.
+        labels:
+          application: prod
+          service: "[[.ApplicationName]]-process-migration-postgresql"
+        name: "[[.ApplicationName]]-process-migration-postgresql"
+      spec:
+        ports:
+          - port: 5432
+            targetPort: 5432
+        selector:
+          deploymentConfig: "[[.ApplicationName]]-process-migration-postgresql"
+  ## PostgreSQL service END
+## KIE PIM END

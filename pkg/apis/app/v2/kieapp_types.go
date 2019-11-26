@@ -109,6 +109,8 @@ type KieAppObjects struct {
 	Servers []KieServerSet `json:"servers,omitempty"`
 	// SmartRouter container configs
 	SmartRouter *SmartRouterObject `json:"smartRouter,omitempty"`
+	// PIM
+	PIM *PIMObject `json:"pim,omitempty"`
 }
 
 // KieAppUpgrades KIE App product upgrade flags
@@ -202,6 +204,7 @@ type Environment struct {
 	Console     CustomObject   `json:"console,omitempty"`
 	SmartRouter CustomObject   `json:"smartRouter,omitempty"`
 	Servers     []CustomObject `json:"servers,omitempty"`
+	PIM         CustomObject   `json:"pim,omitempty"`
 	Others      []CustomObject `json:"others,omitempty"`
 }
 
@@ -218,6 +221,7 @@ type CustomObject struct {
 	ImageStreams           []oimagev1.ImageStream         `json:"imageStreams,omitempty"`
 	Services               []corev1.Service               `json:"services,omitempty"`
 	Routes                 []routev1.Route                `json:"routes,omitempty"`
+	ConfigMaps             []corev1.ConfigMap             `json:"configMaps,omitempty"`
 }
 
 // KieAppBuildObject Data to define how to build an application from source
@@ -384,6 +388,7 @@ type EnvTemplate struct {
 	Servers       []ServerTemplate    `json:"servers,omitempty"`
 	SmartRouter   SmartRouterTemplate `json:"smartRouter,omitempty"`
 	Auth          AuthTemplate        `json:"auth,omitempty"`
+	PIM           PIMTemplate         `json:"pim,omitempty"`
 	Constants     TemplateConstants   `json:"constants,omitempty"`
 }
 
@@ -531,6 +536,27 @@ type AuthTemplate struct {
 type RoleMapperTemplate struct {
 	MountPath            string `json:"mountPath,omitempty"`
 	RoleMapperAuthConfig `json:",inline"`
+}
+
+// PIMObject
+type PIMObject struct {
+	KieAppObject `json:",inline"`
+	Database     DatabaseObject `json:"database,omitempty"`
+}
+
+// PIMTemplate
+type PIMTemplate struct {
+	Image      string         `json:"image,omitempty"`
+	ImageTag   string         `json:"imageTag,omitempty"`
+	KieServers []KieServer    `json:"kieServers,omitempty"`
+	Database   DatabaseObject `json:"database,omitempty"`
+}
+
+// KieServer
+type KieServer struct {
+	Host     string `json:"host,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 // ConditionType - type of condition

@@ -67,6 +67,7 @@ func mergeCustomObject(baseline api.CustomObject, overwrite api.CustomObject) ap
 	object.BuildConfigs = mergeBuildConfigs(baseline.BuildConfigs, overwrite.BuildConfigs)
 	object.Services = mergeServices(baseline.Services, overwrite.Services)
 	object.Routes = mergeRoutes(baseline.Routes, overwrite.Routes)
+	object.ConfigMaps = mergeConfigMaps(baseline.ConfigMaps, overwrite.ConfigMaps)
 	return object
 }
 
@@ -753,6 +754,32 @@ func mergeRoutes(baseline []routev1.Route, overwrite []routev1.Route) []routev1.
 }
 
 func getRouteReferenceSlice(objects []routev1.Route) []api.OpenShiftObject {
+	slice := make([]api.OpenShiftObject, len(objects))
+	for index := range objects {
+		slice[index] = &objects[index]
+	}
+	return slice
+}
+
+func mergeConfigMaps(baseline []corev1.ConfigMap, overwrite []corev1.ConfigMap) []corev1.ConfigMap {
+	if len(overwrite) == 0 {
+		return baseline
+	} else if len(baseline) == 0 {
+		return overwrite
+	} else {
+		baselineRefs := getConfigMapReferenceSlice(baseline)
+		overwriteRefs := getConfigMapReferenceSlice(overwrite)
+		slice := make([]corev1.ConfigMap, combinedSize(baselineRefs, overwriteRefs))
+		err := mergeObjects(baselineRefs, overwriteRefs, slice)
+		if err != nil {
+			log.Error("Error merging objects. ", err)
+			return nil
+		}
+		return slice
+	}
+}
+
+func getConfigMapReferenceSlice(objects []corev1.ConfigMap) []api.OpenShiftObject {
 	slice := make([]api.OpenShiftObject, len(objects))
 	for index := range objects {
 		slice[index] = &objects[index]

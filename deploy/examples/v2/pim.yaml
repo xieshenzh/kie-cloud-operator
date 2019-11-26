@@ -1,0 +1,11 @@
+apiVersion: app.kiegroup.org/v2
+kind: KieApp
+metadata:
+  name: pim-postgresql
+spec:
+  environment: rhpam-trial
+  objects:
+    pim:
+      image: "rhpam-process-migration-rhel8"
+      database:
+        type: "postgresql"

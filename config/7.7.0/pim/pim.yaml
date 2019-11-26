@@ -1,0 +1,160 @@
+## KIE PIM BEGIN
+pim:
+  deploymentConfigs:
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration"
+        labels:
+          app: "[[$.ApplicationName]]"
+          application: "[[$.ApplicationName]]"
+          service: "[[.ApplicationName]]-process-migration"
+      spec:
+        replicas: 1
+        selector:
+          deploymentConfig: "[[.ApplicationName]]-process-migration"
+        strategy:
+          type: Recreate
+        triggers:
+          - type: ImageChange
+            imageChangeParams:
+              automatic: true
+              containerNames:
+                - "[[.ApplicationName]]-process-migration"
+              from:
+                kind: ImageStreamTag
+                namespace: openshift
+                name: "[[.PIM.Image]]:[[.PIM.ImageTag]]"
+          - type: ConfigChange
+        template:
+          metadata:
+            name: "[[.ApplicationName]]-process-migration"
+            labels:
+              app: "[[.ApplicationName]]"
+              application: "[[.ApplicationName]]"
+              deploymentConfig: "[[.ApplicationName]]-process-migration"
+              service: "[[.ApplicationName]]-process-migration"
+          spec:
+            serviceAccountName: "[[$.ApplicationName]]-[[$.Constants.Product]]svc"
+            terminationGracePeriodSeconds: 60
+            containers:
+              - name: "[[.ApplicationName]]-process-migration"
+                image: ""
+                imagePullPolicy: Always
+                resources:
+                  limits:
+                  memory: 512Mi
+                ports:
+                  - name: http
+                    containerPort: 8080
+                    protocol: TCP
+                readinessProbe:
+                  failureThreshold: 36
+                  httpGet:
+                    path: /rest/health
+                    port: 8080
+                    scheme: HTTP
+                  initialDelaySeconds: 30
+                  periodSeconds: 5
+                  successThreshold: 1
+                  timeoutSeconds: 2
+                livenessProbe:
+                  failureThreshold: 3
+                  httpGet:
+                    path: /rest/health
+                    port: 8080
+                    scheme: HTTP
+                  initialDelaySeconds: 180
+                  periodSeconds: 15
+                  successThreshold: 1
+                  timeoutSeconds: 2
+                env:
+                  - name: JBOSS_KIE_ADMIN_USER
+                    value: "[[.AdminUser]]"
+                  - name: JBOSS_KIE_ADMIN_PWD
+                    value: "[[.AdminPassword]]"
+                  - name: JBOSS_KIE_EXTRA_CONFIG
+                    value: "/opt/rhpam-process-migration/config/project-overrides.yml"
+                  #[[if eq .PIM.Database.Type "mysql"]]
+                  - name: JBOSS_KIE_EXTRA_CLASSPATH
+                    value: "/opt/rhpam-process-migration/drivers/mariadb-java-client.jar"
+                  #[[end]]
+                  #[[if eq .PIM.Database.Type "postgresql"]]
+                  - name: JBOSS_KIE_EXTRA_CLASSPATH
+                    value: "/opt/rhpam-process-migration/drivers/postgresql.jar"
+                  #[[end]]
+                volumeMounts:
+                  - mountPath: /opt/rhpam-process-migration/config/project-overrides.yml
+                    subPath: project-overrides.yml
+                    name: config
+            volumes:
+              - name: config
+                configMap:
+                  name: "[[.ApplicationName]]-process-migration"
+                  defaultMode: 420
+  configMaps:
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration"
+      data:
+        project-overrides.yml: |-
+          kieservers:
+            #[[range $index, $Map := .PIM.KieServers]]
+            - host: [[.Host]]
+              username: [[.Username]]
+              password: [[.Password]]
+            #[[end]]
+          #[[if eq .PIM.Database.Type "mysql"]]
+          thorntail:
+            datasources:
+              data-sources:
+                pimDS:
+                  driver-name: mariadb
+                  connection-url: jdbc:mariadb://[[.ApplicationName]]-process-migration-mysql:3306/pimdb?useUnicode=true&useSSL=false&serverTimezone=UTC
+                  user-name: pim
+                  password: "[[$.DBPassword]]"
+          #[[end]]
+          #[[if eq .PIM.Database.Type "postgresql"]]
+          thorntail:
+            datasources:
+              data-sources:
+                pimDS:
+                  driver-name: postgresql
+                  connection-url: jdbc:postgresql://[[.ApplicationName]]-process-migration-postgresql:5432/pimdb
+                  user-name: pim
+                  password: "[[$.DBPassword]]"
+          #[[end]]
+  services:
+    - spec:
+        ports:
+          - name: http
+            port: 8080
+            protocol: TCP
+            targetPort: 8080
+        selector:
+          deploymentConfig: "[[.ApplicationName]]-process-migration"
+      metadata:
+        name: "[[.ApplicationName]]-process-migration"
+        labels:
+          app: "[[$.ApplicationName]]"
+          application: "[[$.ApplicationName]]"
+          service: "[[.ApplicationName]]-process-migration"
+        annotations:
+          description: Process Migration web server's port.
+  routes:
+    - id: "[[.ApplicationName]]-process-migration-http"
+      metadata:
+        name: "[[.ApplicationName]]-process-migration"
+        labels:
+          app: "[[.ApplicationName]]"
+          application: "[[.ApplicationName]]"
+          service: "[[.ApplicationName]]-process-migration"
+        annotations:
+          description: Route for Process Migration https service.
+      spec:
+        to:
+          kind: Service
+          name: "[[.ApplicationName]]-process-migration"
+        port:
+          targetPort: http
+        tls:
+          insecureEdgeTerminationPolicy: Redirect
+          termination: edge
+## KIE PIM END
