@@ -600,7 +600,7 @@ func getCustomObjects(env api.Environment) []api.CustomObject {
 	objects = append(objects, env.Console)
 	objects = append(objects, env.Servers...)
 	objects = append(objects, env.SmartRouter)
-	objects = append(objects, env.PIM)
+	objects = append(objects, env.ProcessMigration)
 	objects = append(objects, env.Others...)
 	return objects
 }

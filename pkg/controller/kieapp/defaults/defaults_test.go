@@ -2861,7 +2861,7 @@ func checkImageNames(cr *api.KieApp, imageName, imageURL string, t *testing.T) {
 	assert.Equal(t, imageURL, env.SmartRouter.DeploymentConfigs[0].Spec.Template.Spec.Containers[0].Image)
 }
 
-func TestDeployPIM(t *testing.T) {
+func TestDeployProcessMigration(t *testing.T) {
 	type args struct {
 		cr *api.KieApp
 	}
@@ -2877,7 +2877,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhpamTrial,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2891,7 +2891,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhpamProduction,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2905,7 +2905,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhpamProductionImmutable,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2919,7 +2919,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhpamAuthoring,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2933,7 +2933,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhpamAuthoringHA,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2947,7 +2947,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhdmTrial,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2961,7 +2961,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhdmProductionImmutable,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2975,7 +2975,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhdmAuthoring,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2989,7 +2989,7 @@ func TestDeployPIM(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhdmAuthoringHA,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 					},
 				},
@@ -2997,7 +2997,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhpamTrial_NoPIM",
+			"RhpamTrial_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3008,7 +3008,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhpamProduction_NoPIM",
+			"RhpamProduction_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3019,7 +3019,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhpamProductionImmutable_NoPIM",
+			"RhpamProductionImmutable_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3030,7 +3030,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhpamAuthoring_NoPIM",
+			"RhpamAuthoring_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3041,7 +3041,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhpamAuthoringHA_NoPIM",
+			"RhpamAuthoringHA_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3052,7 +3052,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhdmTrial_NoPIM",
+			"RhdmTrial_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3063,7 +3063,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhdmProductionImmutable_NoPIM",
+			"RhdmProductionImmutable_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3074,7 +3074,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhdmAuthoring_NoPIM",
+			"RhdmAuthoring_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3085,7 +3085,7 @@ func TestDeployPIM(t *testing.T) {
 			false,
 		},
 		{
-			"RhdmAuthoringHA_NoPIM",
+			"RhdmAuthoringHA_NoProcessMigration",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3098,14 +3098,14 @@ func TestDeployPIM(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := deployPIM(tt.args.cr); got != tt.want {
-				t.Errorf("deployPIM() = %v, want %v", got, tt.want)
+			if got := deployProcessMigration(tt.args.cr); got != tt.want {
+				t.Errorf("deployProcessMigration() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestGetPIMTemplate(t *testing.T) {
+func TestGetProcessMigrationTemplate(t *testing.T) {
 	type args struct {
 		cr            *api.KieApp
 		serversConfig []api.ServerTemplate
@@ -3113,20 +3113,18 @@ func TestGetPIMTemplate(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want api.PIMTemplate
+		want api.ProcessMigrationTemplate
 	}{
 		{
-			"PIM_Custom",
+			"ProcessMigration_Custom",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
 						Environment: api.RhpamTrial,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{
-								KieAppObject: api.KieAppObject{
-									Image:    "test-pim-image",
-									ImageTag: "test-pim-image-tag",
-								},
+							ProcessMigration: &api.ProcessMigrationObject{
+								Image:    "test-pim-image",
+								ImageTag: "test-pim-image-tag",
 								Database: api.DatabaseObject{
 									Type: api.DatabaseMySQL,
 								},
@@ -3144,10 +3142,10 @@ func TestGetPIMTemplate(t *testing.T) {
 					{KieName: "kieserver2"},
 				},
 			},
-			api.PIMTemplate{
+			api.ProcessMigrationTemplate{
 				Image:    "test-pim-image",
 				ImageTag: "test-pim-image-tag",
-				KieServers: []api.KieServer{
+				KieServerClients: []api.KieServerClient{
 					{
 						Host:     "http://kieserver1:8080/services/rest/server",
 						Username: "testuser",
@@ -3165,13 +3163,13 @@ func TestGetPIMTemplate(t *testing.T) {
 			},
 		},
 		{
-			"PIM_Default",
+			"ProcessMigration_Default",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
 						Environment: api.RhpamTrial,
 						Objects: api.KieAppObjects{
-							PIM: &api.PIMObject{},
+							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 						CommonConfig: api.CommonConfig{
 							ImageTag:      "test",
@@ -3184,10 +3182,10 @@ func TestGetPIMTemplate(t *testing.T) {
 					{KieName: "kieserver1"},
 				},
 			},
-			api.PIMTemplate{
+			api.ProcessMigrationTemplate{
 				Image:    "rhpam-process-migration-rhel8",
 				ImageTag: "test",
-				KieServers: []api.KieServer{
+				KieServerClients: []api.KieServerClient{
 					{
 						Host:     "http://kieserver1:8080/services/rest/server",
 						Username: "testuser",
@@ -3200,7 +3198,7 @@ func TestGetPIMTemplate(t *testing.T) {
 			},
 		},
 		{
-			"PIM_Empty",
+			"ProcessMigration_Empty",
 			args{
 				&api.KieApp{
 					Spec: api.KieAppSpec{
@@ -3216,19 +3214,19 @@ func TestGetPIMTemplate(t *testing.T) {
 					{KieName: "kieserver1"},
 				},
 			},
-			api.PIMTemplate{},
+			api.ProcessMigrationTemplate{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getPIMTemplate(tt.args.cr, tt.args.serversConfig); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getPIMTemplate() = %v, want %v", got, tt.want)
+			if got := getProcessMigrationTemplate(tt.args.cr, tt.args.serversConfig); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getProcessMigrationTemplate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestMergePIMDB(t *testing.T) {
+func TestMergeProcessMigrationDB(t *testing.T) {
 	type args struct {
 		service     api.PlatformService
 		cr          *api.KieApp
@@ -3243,13 +3241,13 @@ func TestMergePIMDB(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"PIM_ExternalDB",
+			"ProcessMigration_ExternalDB",
 			args{
 				test.MockService(),
 				&api.KieApp{},
 				api.Environment{},
 				api.EnvTemplate{
-					PIM: api.PIMTemplate{
+					ProcessMigration: api.ProcessMigrationTemplate{
 						Database: api.DatabaseObject{
 							Type: api.DatabaseExternal,
 						},
@@ -3261,13 +3259,13 @@ func TestMergePIMDB(t *testing.T) {
 			true,
 		},
 		{
-			"PIM_H2",
+			"ProcessMigration_H2",
 			args{
 				test.MockService(),
 				&api.KieApp{},
 				api.Environment{},
 				api.EnvTemplate{
-					PIM: api.PIMTemplate{
+					ProcessMigration: api.ProcessMigrationTemplate{
 						Database: api.DatabaseObject{
 							Type: api.DatabaseH2,
 						},
@@ -3279,7 +3277,7 @@ func TestMergePIMDB(t *testing.T) {
 			false,
 		},
 		{
-			"PIM_MySQL",
+			"ProcessMigration_MySQL",
 			args{
 				test.MockService(),
 				&api.KieApp{
@@ -3296,7 +3294,7 @@ func TestMergePIMDB(t *testing.T) {
 					CommonConfig: &api.CommonConfig{
 						ApplicationName: "kietest",
 					},
-					PIM: api.PIMTemplate{
+					ProcessMigration: api.ProcessMigrationTemplate{
 						Database: api.DatabaseObject{
 							Type: api.DatabaseMySQL,
 						},
@@ -3308,7 +3306,7 @@ func TestMergePIMDB(t *testing.T) {
 			false,
 		},
 		{
-			"PIM_POSTGRESSQL",
+			"ProcessMigration_POSTGRESSQL",
 			args{
 				test.MockService(),
 				&api.KieApp{
@@ -3325,7 +3323,7 @@ func TestMergePIMDB(t *testing.T) {
 					CommonConfig: &api.CommonConfig{
 						ApplicationName: "kietest",
 					},
-					PIM: api.PIMTemplate{
+					ProcessMigration: api.ProcessMigrationTemplate{
 						Database: api.DatabaseObject{
 							Type: api.DatabasePostgreSQL,
 						},
@@ -3339,34 +3337,34 @@ func TestMergePIMDB(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := mergePIMDB(tt.args.service, tt.args.cr, tt.args.env, tt.args.envTemplate)
+			got, err := mergeProcessMigrationDB(tt.args.service, tt.args.cr, tt.args.env, tt.args.envTemplate)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("mergePIMDB() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("mergeProcessMigrationDB() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				if got.PIM.DeploymentConfigs == nil || len(got.PIM.DeploymentConfigs) == 0 {
-					t.Errorf("mergePIMDB() got = %v, want %v", got, tt.want)
+				if got.ProcessMigration.DeploymentConfigs == nil || len(got.ProcessMigration.DeploymentConfigs) == 0 {
+					t.Errorf("mergeProcessMigrationDB() got = %v, want %v", got, tt.want)
 				}
 
-				if got.PIM.Services == nil || len(got.PIM.Services) == 0 {
-					t.Errorf("mergePIMDB() got = %v, want %v", got, tt.want)
+				if got.ProcessMigration.Services == nil || len(got.ProcessMigration.Services) == 0 {
+					t.Errorf("mergeProcessMigrationDB() got = %v, want %v", got, tt.want)
 				}
 
-				for _, dc := range got.PIM.DeploymentConfigs {
+				for _, dc := range got.ProcessMigration.DeploymentConfigs {
 					if strings.Contains(dc.Name, tt.wantDB) {
 						goto services
 					}
 				}
-				t.Errorf("mergePIMDB() got = %v, want %v", got, tt.want)
+				t.Errorf("mergeProcessMigrationDB() got = %v, want %v", got, tt.want)
 
 			services:
-				for _, svc := range got.PIM.Services {
+				for _, svc := range got.ProcessMigration.Services {
 					if strings.Contains(svc.Name, tt.wantDB) {
 						return
 					}
 				}
-				t.Errorf("mergePIMDB() got = %v, want %v", got, tt.want)
+				t.Errorf("mergeProcessMigrationDB() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -109,8 +109,8 @@ type KieAppObjects struct {
 	Servers []KieServerSet `json:"servers,omitempty"`
 	// SmartRouter container configs
 	SmartRouter *SmartRouterObject `json:"smartRouter,omitempty"`
-	// PIM
-	PIM *PIMObject `json:"pim,omitempty"`
+	// ProcessMigration
+	ProcessMigration *ProcessMigrationObject `json:"processMigration,omitempty"`
 }
 
 // KieAppUpgrades KIE App product upgrade flags
@@ -201,11 +201,11 @@ type KieAppObject struct {
 }
 
 type Environment struct {
-	Console     CustomObject   `json:"console,omitempty"`
-	SmartRouter CustomObject   `json:"smartRouter,omitempty"`
-	Servers     []CustomObject `json:"servers,omitempty"`
-	PIM         CustomObject   `json:"pim,omitempty"`
-	Others      []CustomObject `json:"others,omitempty"`
+	Console          CustomObject   `json:"console,omitempty"`
+	SmartRouter      CustomObject   `json:"smartRouter,omitempty"`
+	Servers          []CustomObject `json:"servers,omitempty"`
+	ProcessMigration CustomObject   `json:"processMigration,omitempty"`
+	Others           []CustomObject `json:"others,omitempty"`
 }
 
 type CustomObject struct {
@@ -383,13 +383,13 @@ type OpenShiftObject interface {
 }
 
 type EnvTemplate struct {
-	*CommonConfig `json:",inline"`
-	Console       ConsoleTemplate     `json:"console,omitempty"`
-	Servers       []ServerTemplate    `json:"servers,omitempty"`
-	SmartRouter   SmartRouterTemplate `json:"smartRouter,omitempty"`
-	Auth          AuthTemplate        `json:"auth,omitempty"`
-	PIM           PIMTemplate         `json:"pim,omitempty"`
-	Constants     TemplateConstants   `json:"constants,omitempty"`
+	*CommonConfig    `json:",inline"`
+	Console          ConsoleTemplate          `json:"console,omitempty"`
+	Servers          []ServerTemplate         `json:"servers,omitempty"`
+	SmartRouter      SmartRouterTemplate      `json:"smartRouter,omitempty"`
+	Auth             AuthTemplate             `json:"auth,omitempty"`
+	ProcessMigration ProcessMigrationTemplate `json:"processMigration,omitempty"`
+	Constants        TemplateConstants        `json:"constants,omitempty"`
 }
 
 // TemplateConstants constant values that are used within the different configuration templates
@@ -538,22 +538,23 @@ type RoleMapperTemplate struct {
 	RoleMapperAuthConfig `json:",inline"`
 }
 
-// PIMObject
-type PIMObject struct {
-	KieAppObject `json:",inline"`
-	Database     DatabaseObject `json:"database,omitempty"`
+// ProcessMigrationObject
+type ProcessMigrationObject struct {
+	Image    string         `json:"image,omitempty"`
+	ImageTag string         `json:"imageTag,omitempty"`
+	Database DatabaseObject `json:"database,omitempty"`
 }
 
-// PIMTemplate
-type PIMTemplate struct {
-	Image      string         `json:"image,omitempty"`
-	ImageTag   string         `json:"imageTag,omitempty"`
-	KieServers []KieServer    `json:"kieServers,omitempty"`
-	Database   DatabaseObject `json:"database,omitempty"`
+// ProcessMigrationTemplate
+type ProcessMigrationTemplate struct {
+	Image            string            `json:"image,omitempty"`
+	ImageTag         string            `json:"imageTag,omitempty"`
+	KieServerClients []KieServerClient `json:"kieServerClients,omitempty"`
+	Database         DatabaseObject    `json:"database,omitempty"`
 }
 
-// KieServer
-type KieServer struct {
+// KieServerClient
+type KieServerClient struct {
 	Host     string `json:"host,omitempty"`
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`

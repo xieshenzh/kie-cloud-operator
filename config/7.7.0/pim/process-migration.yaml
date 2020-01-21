@@ -1,5 +1,5 @@
-## KIE PIM BEGIN
-pim:
+## KIE ProcessMigration BEGIN
+processMigration:
   deploymentConfigs:
     - metadata:
         name: "[[.ApplicationName]]-process-migration"
@@ -22,7 +22,7 @@ pim:
               from:
                 kind: ImageStreamTag
                 namespace: openshift
-                name: "[[.PIM.Image]]:[[.PIM.ImageTag]]"
+                name: "[[.ProcessMigration.Image]]:[[.ProcessMigration.ImageTag]]"
           - type: ConfigChange
         template:
           metadata:
@@ -73,13 +73,13 @@ pim:
                     value: "[[.AdminPassword]]"
                   - name: JBOSS_KIE_EXTRA_CONFIG
                     value: "/opt/rhpam-process-migration/config/project-overrides.yml"
-                  #[[if eq .PIM.Database.Type "mysql"]]
+                  #[[if eq .ProcessMigration.Database.Type "mysql"]]
                   - name: JBOSS_KIE_EXTRA_CLASSPATH
                     value: "/opt/rhpam-process-migration/drivers/mariadb-java-client.jar"
                   #[[end]]
-                  #[[if eq .PIM.Database.Type "postgresql"]]
+                  #[[if eq .ProcessMigration.Database.Type "postgresql"]]
                   - name: JBOSS_KIE_EXTRA_CLASSPATH
-                    value: "/opt/rhpam-process-migration/drivers/postgresql.jar"
+                    value: "/opt/rhpam-process-migration/drivers/postgresql-jdbc.jar"
                   #[[end]]
                 volumeMounts:
                   - mountPath: /opt/rhpam-process-migration/config/project-overrides.yml
@@ -96,12 +96,12 @@ pim:
       data:
         project-overrides.yml: |-
           kieservers:
-            #[[range $index, $Map := .PIM.KieServers]]
+            #[[range $index, $Map := .ProcessMigration.KieServerClients]]
             - host: [[.Host]]
               username: [[.Username]]
               password: [[.Password]]
             #[[end]]
-          #[[if eq .PIM.Database.Type "mysql"]]
+          #[[if eq .ProcessMigration.Database.Type "mysql"]]
           thorntail:
             datasources:
               data-sources:
@@ -111,7 +111,7 @@ pim:
                   user-name: pim
                   password: "[[$.DBPassword]]"
           #[[end]]
-          #[[if eq .PIM.Database.Type "postgresql"]]
+          #[[if eq .ProcessMigration.Database.Type "postgresql"]]
           thorntail:
             datasources:
               data-sources:
@@ -157,4 +157,4 @@ pim:
         tls:
           insecureEdgeTerminationPolicy: Redirect
           termination: edge
-## KIE PIM END
+## KIE ProcessMigration END

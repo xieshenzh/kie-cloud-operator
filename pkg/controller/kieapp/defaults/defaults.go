@@ -104,7 +104,7 @@ func GetEnvironment(cr *api.KieApp, service kubernetes.PlatformService) (api.Env
 	if err != nil {
 		return api.Environment{}, err
 	}
-	mergedEnv, err = mergePIM(service, cr, mergedEnv, envTemplate)
+	mergedEnv, err = mergeProcessMigration(service, cr, mergedEnv, envTemplate)
 	if err != nil {
 		return api.Environment{}, err
 	}
@@ -188,7 +188,7 @@ func getEnvTemplate(cr *api.KieApp) (envTemplate api.EnvTemplate, err error) {
 		Console:      getConsoleTemplate(cr),
 		Servers:      serversConfig,
 		SmartRouter:  getSmartRouterTemplate(cr),
-		PIM:          getPIMTemplate(cr, serversConfig),
+		PIM:          getProcessMigrationTemplate(cr, serversConfig),
 		Constants:    *getTemplateConstants(cr),
 	}
 	if err := configureAuth(cr, &envTemplate); err != nil {
@@ -936,69 +936,66 @@ func setDefaults(cr *api.KieApp) {
 	setPasswords(cr, isTrialEnv)
 }
 
-func getPIMTemplate(cr *api.KieApp, serversConfig []api.ServerTemplate) api.PIMTemplate {
-	pimTemplate := api.PIMTemplate{}
-	if deployPIM(cr) {
-		if cr.Spec.Objects.PIM.Image != "" {
-			pimTemplate.Image = cr.Spec.Objects.PIM.Image
+func getProcessMigrationTemplate(cr *api.KieApp, serversConfig []api.ServerTemplate) api.ProcessMigrationTemplate {
+	processMigrationTemplate := api.ProcessMigrationTemplate{}
+	if deployProcessMigration(cr) {
+		if cr.Spec.Objects.ProcessMigration.Image != "" {
+			processMigrationTemplate.Image = cr.Spec.Objects.ProcessMigration.Image
 		} else {
-			pimTemplate.Image = fmt.Sprintf("%s-process-migration-rhel8", constants.RhpamPrefix)
+			processMigrationTemplate.Image = fmt.Sprintf("%s-process-migration-rhel8", constants.RhpamPrefix)
 		}
-		if cr.Spec.Objects.PIM.ImageTag != "" {
-			pimTemplate.ImageTag = cr.Spec.Objects.PIM.ImageTag
+		if cr.Spec.Objects.ProcessMigration.ImageTag != "" {
+			processMigrationTemplate.ImageTag = cr.Spec.Objects.ProcessMigration.ImageTag
 		} else {
-			pimTemplate.ImageTag = cr.Spec.CommonConfig.ImageTag
+			processMigrationTemplate.ImageTag = cr.Spec.CommonConfig.ImageTag
 		}
 		for _, sc := range serversConfig {
-			pimTemplate.KieServers = append(pimTemplate.KieServers, api.KieServer{
+			processMigrationTemplate.KieServerClients = append(processMigrationTemplate.KieServerClients, api.KieServerClient{
 				Host:     fmt.Sprintf("http://%s:8080/services/rest/server", sc.KieName),
 				Username: cr.Spec.CommonConfig.AdminUser,
 				Password: cr.Spec.CommonConfig.AdminPassword,
 			})
 		}
-		if cr.Spec.Objects.PIM.Database.Type == "" {
-			pimTemplate.Database.Type = api.DatabaseH2
+		if cr.Spec.Objects.ProcessMigration.Database.Type == "" {
+			processMigrationTemplate.Database.Type = api.DatabaseH2
 		} else {
-			pimTemplate.Database.Type = cr.Spec.Objects.PIM.Database.Type
+			processMigrationTemplate.Database.Type = cr.Spec.Objects.ProcessMigration.Database.Type
 		}
 	}
-	return pimTemplate
+	return processMigrationTemplate
 }
 
-func mergePIM(service api.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {
-	var pimEnv api.Environment
-	if deployPIM(cr) {
-		yamlBytes, err := loadYaml(service, "pim/pim.yaml", cr.Spec.Version, cr.Namespace, envTemplate)
+func mergeProcessMigration(service api.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {
+	var ProcessMigrationEnv api.Environment
+	if deployProcessMigration(cr) {
+		yamlBytes, err := loadYaml(service, "pim/process-migration.yaml", cr.Spec.Version, cr.Namespace, envTemplate)
 		if err != nil {
 			return api.Environment{}, err
 		}
-		err = yaml.Unmarshal(yamlBytes, &pimEnv)
+		err = yaml.Unmarshal(yamlBytes, &ProcessMigrationEnv)
 		if err != nil {
 			return api.Environment{}, err
 		}
 
-		env.PIM = mergeCustomObject(env.PIM, pimEnv.PIM)
+		env.ProcessMigration = mergeCustomObject(env.ProcessMigration, ProcessMigrationEnv.ProcessMigration)
 
-		env, err = mergePIMDB(service, cr, env, envTemplate)
+		env, err = mergeProcessMigrationDB(service, cr, env, envTemplate)
 		if err != nil {
 			return api.Environment{}, nil
 		}
 	} else {
-		pimEnv.PIM.Omit = true
+		ProcessMigrationEnv.ProcessMigration.Omit = true
 	}
 
 	return env, nil
 }
 
-func mergePIMDB(service api.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {
-	if envTemplate.PIM.Database.Type == api.DatabaseExternal {
-		return api.Environment{}, fmt.Errorf("external database type is not supported for Process Instance Migration")
-	}
-	if envTemplate.PIM.Database.Type == api.DatabaseH2 {
+func mergeProcessMigrationDB(service api.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {
+	if envTemplate.ProcessMigration.Database.Type == api.DatabaseH2 {
 		return env, nil
 	}
 
-	yamlBytes, err := loadYaml(service, fmt.Sprintf("pim/dbs/%s.yaml", envTemplate.PIM.Database.Type), cr.Spec.Version, cr.Namespace, envTemplate)
+	yamlBytes, err := loadYaml(service, fmt.Sprintf("pim/dbs/%s.yaml", envTemplate.ProcessMigration.Database.Type), cr.Spec.Version, cr.Namespace, envTemplate)
 	if err != nil {
 		return api.Environment{}, err
 	}
@@ -1007,7 +1004,7 @@ func mergePIMDB(service api.PlatformService, cr *api.KieApp, env api.Environment
 	if err != nil {
 		return api.Environment{}, err
 	}
-	env.PIM = mergeCustomObject(env.PIM, dbEnv.PIM)
+	env.ProcessMigration = mergeCustomObject(env.ProcessMigration, dbEnv.ProcessMigration)
 
 	return env, nil
 }
@@ -1020,6 +1017,6 @@ func isRHPAM(cr *api.KieApp) bool {
 	return false
 }
 
-func deployPIM(cr *api.KieApp) bool {
-	return cr.Spec.Objects.PIM != nil && isRHPAM(cr)
+func deployProcessMigration(cr *api.KieApp) bool {
+	return cr.Spec.Objects.ProcessMigration != nil && isRHPAM(cr)
 }

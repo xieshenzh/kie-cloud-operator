@@ -1,6 +1,6 @@
-## KIE PIM BEGIN
-pim:
-  ## KIE PIM deployment config BEGIN
+## KIE ProcessMigration BEGIN
+processMigration:
+  ## KIE ProcessMigration deployment config BEGIN
   deploymentConfigs:
     - metadata:
         name: "[[.ApplicationName]]-process-migration"
@@ -10,15 +10,16 @@ pim:
             initContainers:
               - command:
                   [
-                    "sh",
+                    "/bin/bash",
                     "-c",
-                    "until nslookup [[.ApplicationName]]-process-migration-postgresql && nc -vz [[.ApplicationName]]-process-migration-postgresql 5432; do echo waiting for [[.ApplicationName]]-process-migration-postgresql; sleep 2; done;",
+                    ">-
+                    replicas=$(oc get dc [[.ApplicationName]]-process-migration-postgresql -o=jsonpath='{.status.availableReplicas}'); until '[' $replicas -gt 0 ']'; do echo waiting for [[.ApplicationName]]-process-migration-postgresql; replicas=$(oc get dc [[.ApplicationName]]-process-migration-postgresql -o=jsonpath='{.status.availableReplicas}'); sleep 2; done;",
                   ]
-                image: busybox
+                image: registry.redhat.io/openshift3/ose-cli:v3.11
                 imagePullPolicy: IfNotPresent
                 name: "[[.ApplicationName]]-process-migration-postgresql-init"
                 terminationMessagePolicy: FallbackToLogsOnError
-    ## KIE PIM deployment config END
+    ## KIE ProcessMigration deployment config END
     ## PostgreSQL deployment config BEGIN
     - metadata:
         name: "[[.ApplicationName]]-process-migration-postgresql"
@@ -87,7 +88,7 @@ pim:
                 volumeMounts:
                   - mountPath: "/var/lib/pgsql/data"
                     name: "[[.ApplicationName]]-process-migration-postgresql-[[$.Constants.DatabaseVolumeSuffix]]"
-            ##[[ if ne .PIM.Database.Size "" ]]
+            ##[[ if ne .ProcessMigration.Database.Size "" ]]
             volumes:
               - name: "[[.ApplicationName]]-process-migration-postgresql-[[$.Constants.DatabaseVolumeSuffix]]"
                 persistentVolumeClaim:
@@ -106,7 +107,7 @@ pim:
           - ReadWriteOnce
         resources:
           requests:
-            storage: "[[.PIM.Database.Size]]"
+            storage: "[[.ProcessMigration.Database.Size]]"
             ## PostgreSQL persistent volume claim END
             ##[[ else ]]
             volumes:
@@ -130,4 +131,4 @@ pim:
         selector:
           deploymentConfig: "[[.ApplicationName]]-process-migration-postgresql"
   ## PostgreSQL service END
-## KIE PIM END
+## KIE ProcessMigration END

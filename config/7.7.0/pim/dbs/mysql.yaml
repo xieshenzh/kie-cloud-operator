@@ -1,6 +1,6 @@
-## KIE PIM BEGIN
-pim:
-  ## KIE PIM deployment config BEGIN
+## KIE ProcessMigration BEGIN
+processMigration:
+  ## KIE ProcessMigration deployment config BEGIN
   deploymentConfigs:
     - metadata:
         name: "[[.ApplicationName]]-process-migration"
@@ -10,15 +10,16 @@ pim:
             initContainers:
               - command:
                   [
-                    "sh",
+                    "/bin/bash",
                     "-c",
-                    "until nslookup [[.ApplicationName]]-process-migration-mysql && nc -vz [[.ApplicationName]]-process-migration-mysql 3306; do echo waiting for [[.ApplicationName]]-process-migration-mysql; sleep 2; done;",
+                    ">-
+                    replicas=$(oc get dc [[.ApplicationName]]-process-migration-mysql -o=jsonpath='{.status.availableReplicas}'); until '[' $replicas -gt 0 ']'; do echo waiting for [[.ApplicationName]]-process-migration-mysql; replicas=$(oc get dc [[.ApplicationName]]-process-migration-mysql -o=jsonpath='{.status.availableReplicas}'); sleep 2; done;",
                   ]
-                image: busybox
+                image: registry.redhat.io/openshift3/ose-cli:v3.11
                 imagePullPolicy: IfNotPresent
                 name: "[[.ApplicationName]]-process-migration-mysql-init"
                 terminationMessagePolicy: FallbackToLogsOnError
-    ## KIE PIM deployment config END
+    ## KIE ProcessMigration deployment config END
     ## MySQL deployment BEGIN
     - metadata:
         name: "[[.ApplicationName]]-process-migration-mysql"
@@ -85,7 +86,7 @@ pim:
                 volumeMounts:
                   - mountPath: "/var/lib/mysql/data"
                     name: "[[.ApplicationName]]-process-migration-mysql-[[$.Constants.DatabaseVolumeSuffix]]"
-            ##[[ if ne .PIM.Database.Size "" ]]
+            ##[[ if ne .ProcessMigration.Database.Size "" ]]
             volumes:
               - name: "[[.ApplicationName]]-process-migration-mysql-[[$.Constants.DatabaseVolumeSuffix]]"
                 persistentVolumeClaim:
@@ -104,7 +105,7 @@ pim:
           - ReadWriteOnce
         resources:
           requests:
-            storage: "[[.PIM.Database.Size]]"
+            storage: "[[.ProcessMigration.Database.Size]]"
             ## MySQL persistent volume claim END
             ##[[ else ]]
             volumes:
@@ -129,4 +130,4 @@ pim:
         annotations:
           description: The MySQL server's port.
   ## MySQL service END
-## KIE PIM END
+## KIE ProcessMigration END
