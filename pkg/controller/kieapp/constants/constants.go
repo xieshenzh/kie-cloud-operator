@@ -167,13 +167,11 @@ var Images = []ImageEnv{
 		Component: "rhpam-7-smartrouter-rhel8-container",
 		Registry:  PamContext + "smartrouter" + RhelVersion,
 	},
-	/*
-		{
-			Var:       PamProcessMigrationVar,
-			Component: "rhpam-7-process-migration-rhel8-container",
-			Registry:  PamContext + "process-migration" + RhelVersion,
-		},
-	*/
+	{
+		Var:       PamProcessMigrationVar,
+		Component: "rhpam-7-process-migration-rhel8-container",
+		Registry:  PamContext + "process-migration" + RhelVersion,
+	},
 }
 
 type ImageEnv struct {

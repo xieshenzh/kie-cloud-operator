@@ -40,6 +40,10 @@ spec:
     name: rhpam-7-smartrouter-rhel8-container
   - from:
       kind: DockerImage
+      name: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.8.0
+    name: rhpam-7-process-migration-rhel8-container
+  - from:
+      kind: DockerImage
       name: registry.redhat.io/rhdm-7/rhdm-kieserver-rhel8:7.7.1
     name: rhdm-7-kieserver-rhel8-container
   - from:
@@ -72,6 +76,10 @@ spec:
     name: rhpam-7-smartrouter-rhel8-container
   - from:
       kind: DockerImage
+      name: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.7.1
+    name: rhpam-7-process-migration-rhel8-container
+  - from:
+      kind: DockerImage
       name: registry.redhat.io/rhdm-7/rhdm-kieserver-rhel8:7.7.0
     name: rhdm-7-kieserver-rhel8-container
   - from:
@@ -102,6 +110,10 @@ spec:
       kind: DockerImage
       name: registry.redhat.io/rhpam-7/rhpam-smartrouter-rhel8:7.7.0
     name: rhpam-7-smartrouter-rhel8-container
+  - from:
+      kind: DockerImage
+      name: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.7.0
+    name: rhpam-7-process-migration-rhel8-container
   - from:
       kind: DockerImage
       name: registry.redhat.io/openshift3/oauth-proxy:v3.11

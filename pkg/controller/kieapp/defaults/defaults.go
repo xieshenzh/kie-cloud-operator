@@ -184,12 +184,12 @@ func getEnvTemplate(cr *api.KieApp) (envTemplate api.EnvTemplate, err error) {
 		return envTemplate, err
 	}
 	envTemplate = api.EnvTemplate{
-		CommonConfig: &cr.Spec.CommonConfig,
-		Console:      getConsoleTemplate(cr),
-		Servers:      serversConfig,
-		SmartRouter:  getSmartRouterTemplate(cr),
-		PIM:          getProcessMigrationTemplate(cr, serversConfig),
-		Constants:    *getTemplateConstants(cr),
+		CommonConfig:     &cr.Spec.CommonConfig,
+		Console:          getConsoleTemplate(cr),
+		Servers:          serversConfig,
+		SmartRouter:      getSmartRouterTemplate(cr),
+		ProcessMigration: getProcessMigrationTemplate(cr, serversConfig),
+		Constants:        *getTemplateConstants(cr),
 	}
 	if err := configureAuth(cr, &envTemplate); err != nil {
 		log.Error("unable to setup authentication: ", err)
@@ -947,7 +947,7 @@ func getProcessMigrationTemplate(cr *api.KieApp, serversConfig []api.ServerTempl
 		if cr.Spec.Objects.ProcessMigration.ImageTag != "" {
 			processMigrationTemplate.ImageTag = cr.Spec.Objects.ProcessMigration.ImageTag
 		} else {
-			processMigrationTemplate.ImageTag = cr.Spec.CommonConfig.ImageTag
+			processMigrationTemplate.ImageTag = cr.Spec.Version
 		}
 		for _, sc := range serversConfig {
 			processMigrationTemplate.KieServerClients = append(processMigrationTemplate.KieServerClients, api.KieServerClient{
@@ -965,7 +965,7 @@ func getProcessMigrationTemplate(cr *api.KieApp, serversConfig []api.ServerTempl
 	return processMigrationTemplate
 }
 
-func mergeProcessMigration(service api.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {
+func mergeProcessMigration(service kubernetes.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {
 	var ProcessMigrationEnv api.Environment
 	if deployProcessMigration(cr) {
 		yamlBytes, err := loadYaml(service, "pim/process-migration.yaml", cr.Spec.Version, cr.Namespace, envTemplate)
@@ -990,7 +990,7 @@ func mergeProcessMigration(service api.PlatformService, cr *api.KieApp, env api.
 	return env, nil
 }
 
-func mergeProcessMigrationDB(service api.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {
+func mergeProcessMigrationDB(service kubernetes.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {
 	if envTemplate.ProcessMigration.Database.Type == api.DatabaseH2 {
 		return env, nil
 	}

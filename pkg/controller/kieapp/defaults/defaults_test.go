@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/RHsyseng/operator-utils/pkg/utils/kubernetes"
 	"github.com/ghodss/yaml"
 	"github.com/gobuffalo/packr/v2"
 	api "github.com/kiegroup/kie-cloud-operator/pkg/apis/app/v2"
@@ -3131,10 +3132,10 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 							},
 						},
 						CommonConfig: api.CommonConfig{
-							ImageTag:      "test",
 							AdminUser:     "testuser",
 							AdminPassword: "testpassword",
 						},
+						Version: "test",
 					},
 				},
 				[]api.ServerTemplate{
@@ -3172,10 +3173,10 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 							ProcessMigration: &api.ProcessMigrationObject{},
 						},
 						CommonConfig: api.CommonConfig{
-							ImageTag:      "test",
 							AdminUser:     "testuser",
 							AdminPassword: "testpassword",
 						},
+						Version: "test",
 					},
 				},
 				[]api.ServerTemplate{
@@ -3204,10 +3205,10 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 					Spec: api.KieAppSpec{
 						Environment: api.RhpamTrial,
 						CommonConfig: api.CommonConfig{
-							ImageTag:      "test",
 							AdminUser:     "testuser",
 							AdminPassword: "testpassword",
 						},
+						Version: "test",
 					},
 				},
 				[]api.ServerTemplate{
@@ -3228,7 +3229,7 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 
 func TestMergeProcessMigrationDB(t *testing.T) {
 	type args struct {
-		service     api.PlatformService
+		service     kubernetes.PlatformService
 		cr          *api.KieApp
 		env         api.Environment
 		envTemplate api.EnvTemplate

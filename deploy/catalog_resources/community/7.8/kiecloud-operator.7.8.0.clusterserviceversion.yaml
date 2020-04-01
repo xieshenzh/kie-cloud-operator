@@ -7,7 +7,7 @@ metadata:
     categories: Integration & Delivery
     certified: "false"
     containerImage: quay.io/kiegroup/kie-cloud-operator:7.8.0
-    createdAt: "2020-04-01 16:16:00"
+    createdAt: "2020-04-02 09:35:37"
     description: Deploys and manages Red Hat Process Automation Manager and Red Hat
       Decision Manager environments.
     repository: https://github.com/kiegroup/kie-cloud-operator
@@ -185,6 +185,8 @@ spec:
                   value: registry.redhat.io/rhpam-7/rhpam-businesscentral-monitoring-rhel8:7.8.0
                 - name: PAM_SMARTROUTER_IMAGE_7.8.0
                   value: registry.redhat.io/rhpam-7/rhpam-smartrouter-rhel8:7.8.0
+                - name: PAM_PROCESS_MIGRATION_IMAGE_7.8.0
+                  value: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.8.0
                 - name: OSE_CLI_IMAGE_7.8.0
                   value: registry.redhat.io/openshift3/ose-cli:v3.11
                 - name: MYSQL_PROXY_IMAGE_7.8.0
@@ -211,6 +213,8 @@ spec:
                   value: registry.redhat.io/rhpam-7/rhpam-businesscentral-monitoring-rhel8:7.7.1
                 - name: PAM_SMARTROUTER_IMAGE_7.7.1
                   value: registry.redhat.io/rhpam-7/rhpam-smartrouter-rhel8:7.7.1
+                - name: PAM_PROCESS_MIGRATION_IMAGE_7.7.1
+                  value: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.7.1
                 - name: OSE_CLI_IMAGE_7.7.1
                   value: registry.redhat.io/openshift3/ose-cli:v3.11
                 - name: MYSQL_PROXY_IMAGE_7.7.1
@@ -237,6 +241,8 @@ spec:
                   value: registry.redhat.io/rhpam-7/rhpam-businesscentral-monitoring-rhel8:7.7.0
                 - name: PAM_SMARTROUTER_IMAGE_7.7.0
                   value: registry.redhat.io/rhpam-7/rhpam-smartrouter-rhel8:7.7.0
+                - name: PAM_PROCESS_MIGRATION_IMAGE_7.7.0
+                  value: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.7.0
                 - name: OSE_CLI_IMAGE_7.7.0
                   value: registry.redhat.io/openshift3/ose-cli:v3.11
                 - name: MYSQL_PROXY_IMAGE_7.7.0
@@ -442,6 +448,8 @@ spec:
     name: rhpam-businesscentral-monitoring-rhel8
   - image: registry.redhat.io/rhpam-7/rhpam-smartrouter-rhel8:7.8.0
     name: rhpam-smartrouter-rhel8
+  - image: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.8.0
+    name: rhpam-process-migration-rhel8
   - image: registry.redhat.io/rhdm-7/rhdm-kieserver-rhel8:7.7.1
     name: rhdm-kieserver-rhel8
   - image: registry.redhat.io/rhdm-7/rhdm-controller-rhel8:7.7.1
@@ -458,6 +466,8 @@ spec:
     name: rhpam-businesscentral-monitoring-rhel8
   - image: registry.redhat.io/rhpam-7/rhpam-smartrouter-rhel8:7.7.1
     name: rhpam-smartrouter-rhel8
+  - image: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.7.1
+    name: rhpam-process-migration-rhel8
   - image: registry.redhat.io/rhdm-7/rhdm-kieserver-rhel8:7.7.0
     name: rhdm-kieserver-rhel8
   - image: registry.redhat.io/rhdm-7/rhdm-controller-rhel8:7.7.0
@@ -474,6 +484,8 @@ spec:
     name: rhpam-businesscentral-monitoring-rhel8
   - image: registry.redhat.io/rhpam-7/rhpam-smartrouter-rhel8:7.7.0
     name: rhpam-smartrouter-rhel8
+  - image: registry.redhat.io/rhpam-7/rhpam-process-migration-rhel8:7.7.0
+    name: rhpam-process-migration-rhel8
   - image: registry.redhat.io/openshift3/oauth-proxy:v3.11
     name: oauth-proxy
   - image: registry.redhat.io/openshift3/ose-cli:v3.11
