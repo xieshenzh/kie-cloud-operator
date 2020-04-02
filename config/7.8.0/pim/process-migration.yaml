@@ -73,14 +73,6 @@ processMigration:
                     value: "[[.AdminPassword]]"
                   - name: JBOSS_KIE_EXTRA_CONFIG
                     value: "/opt/rhpam-process-migration/config/project-overrides.yml"
-                  #[[if eq .ProcessMigration.Database.Type "mysql"]]
-                  - name: JBOSS_KIE_EXTRA_CLASSPATH
-                    value: "/opt/rhpam-process-migration/drivers/mariadb-java-client.jar"
-                  #[[end]]
-                  #[[if eq .ProcessMigration.Database.Type "postgresql"]]
-                  - name: JBOSS_KIE_EXTRA_CLASSPATH
-                    value: "/opt/rhpam-process-migration/drivers/postgresql-jdbc.jar"
-                  #[[end]]
                 volumeMounts:
                   - mountPath: /opt/rhpam-process-migration/config/project-overrides.yml
                     subPath: project-overrides.yml
@@ -101,26 +93,6 @@ processMigration:
               username: [[.Username]]
               password: [[.Password]]
             #[[end]]
-          #[[if eq .ProcessMigration.Database.Type "mysql"]]
-          thorntail:
-            datasources:
-              data-sources:
-                pimDS:
-                  driver-name: mariadb
-                  connection-url: jdbc:mariadb://[[.ApplicationName]]-process-migration-mysql:3306/pimdb?useUnicode=true&useSSL=false&serverTimezone=UTC
-                  user-name: pim
-                  password: "[[$.DBPassword]]"
-          #[[end]]
-          #[[if eq .ProcessMigration.Database.Type "postgresql"]]
-          thorntail:
-            datasources:
-              data-sources:
-                pimDS:
-                  driver-name: postgresql
-                  connection-url: jdbc:postgresql://[[.ApplicationName]]-process-migration-postgresql:5432/pimdb
-                  user-name: pim
-                  password: "[[$.DBPassword]]"
-          #[[end]]
   services:
     - spec:
         ports:

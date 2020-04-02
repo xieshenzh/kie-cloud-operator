@@ -15,12 +15,17 @@ processMigration:
                     ">-
                     replicas=$(oc get dc [[.ApplicationName]]-process-migration-postgresql -o=jsonpath='{.status.availableReplicas}'); until '[' $replicas -gt 0 ']'; do echo waiting for [[.ApplicationName]]-process-migration-postgresql; replicas=$(oc get dc [[.ApplicationName]]-process-migration-postgresql -o=jsonpath='{.status.availableReplicas}'); sleep 2; done;",
                   ]
-                image: registry.redhat.io/openshift3/ose-cli:v3.11
+                image: "[[$.Constants.OseCliImageURL]]"
                 imagePullPolicy: IfNotPresent
                 name: "[[.ApplicationName]]-process-migration-postgresql-init"
                 terminationMessagePolicy: FallbackToLogsOnError
-    ## KIE ProcessMigration deployment config END
-    ## PostgreSQL deployment config BEGIN
+            containers:
+              - name: "[[.ApplicationName]]-process-migration"
+                env:
+                  - name: JBOSS_KIE_EXTRA_CLASSPATH
+                    value: "/opt/rhpam-process-migration/drivers/postgresql-jdbc.jar"
+  ## KIE ProcessMigration deployment config END
+  ## PostgreSQL deployment config BEGIN
     - metadata:
         name: "[[.ApplicationName]]-process-migration-postgresql"
         labels:
@@ -34,15 +39,6 @@ processMigration:
             maxUnavailable: 0
           type: Rolling
         triggers:
-          - type: ImageChange
-            imageChangeParams:
-              automatic: true
-              containerNames:
-                - "[[.ApplicationName]]-process-migration-postgresql"
-              from:
-                kind: ImageStreamTag
-                namespace: "openshift"
-                name: "postgresql:10"
           - type: ConfigChange
         replicas: 1
         selector:
@@ -58,7 +54,7 @@ processMigration:
           spec:
             containers:
               - name: "[[.ApplicationName]]-process-migration-postgresql"
-                image: postgresql
+                image: "[[$.Constants.PostgreSQLImageURL]]"
                 imagePullPolicy: IfNotPresent
                 livenessProbe:
                   exec:
@@ -103,6 +99,9 @@ processMigration:
           application: "[[$.ApplicationName]]"
           service: "[[.ApplicationName]]-process-migration-postgresql"
       spec:
+        # [[ if ne .ProcessMigration.Database.StorageClassName "" ]]
+        storageClassName: "[[.ProcessMigration.Database.StorageClassName]]"
+        # [[ end ]]
         accessModes:
           - ReadWriteOnce
         resources:
@@ -131,4 +130,25 @@ processMigration:
         selector:
           deploymentConfig: "[[.ApplicationName]]-process-migration-postgresql"
   ## PostgreSQL service END
+  ## KIE ProcessMigration ConfigMap BEGIN
+  configMaps:
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration"
+      data:
+        project-overrides.yml: |-
+          kieservers:
+            #[[range $index, $Map := .ProcessMigration.KieServerClients]]
+            - host: [[.Host]]
+              username: [[.Username]]
+              password: [[.Password]]
+            #[[end]]
+          thorntail:
+            datasources:
+              data-sources:
+                pimDS:
+                  driver-name: postgresql
+                  connection-url: jdbc:postgresql://[[.ApplicationName]]-process-migration-postgresql:5432/pimdb
+                  user-name: pim
+                  password: "[[$.DBPassword]]"
+  ## KIE ProcessMigration ConfigMap END
 ## KIE ProcessMigration END

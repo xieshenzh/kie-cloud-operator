@@ -764,19 +764,41 @@ func getRouteReferenceSlice(objects []routev1.Route) []api.OpenShiftObject {
 func mergeConfigMaps(baseline []corev1.ConfigMap, overwrite []corev1.ConfigMap) []corev1.ConfigMap {
 	if len(overwrite) == 0 {
 		return baseline
-	} else if len(baseline) == 0 {
-		return overwrite
-	} else {
-		baselineRefs := getConfigMapReferenceSlice(baseline)
-		overwriteRefs := getConfigMapReferenceSlice(overwrite)
-		slice := make([]corev1.ConfigMap, combinedSize(baselineRefs, overwriteRefs))
-		err := mergeObjects(baselineRefs, overwriteRefs, slice)
-		if err != nil {
-			log.Error("Error merging objects. ", err)
-			return nil
-		}
-		return slice
 	}
+	if len(baseline) == 0 {
+		return overwrite
+	}
+	baselineRefs := getConfigMapReferenceSlice(baseline)
+	overwriteRefs := getConfigMapReferenceSlice(overwrite)
+	for overwriteIndex := range overwrite {
+		overwriteItem := &overwrite[overwriteIndex]
+		baselineIndex, _ := findOpenShiftObject(overwriteItem, baselineRefs)
+		if baselineIndex >= 0 {
+			baselineItem := baseline[baselineIndex]
+			err := mergo.Merge(&overwriteItem.ObjectMeta, baselineItem.ObjectMeta)
+			if err != nil {
+				log.Error("Error merging interfaces. ", err)
+				return nil
+			}
+			err = mergo.Merge(&overwriteItem.Data, baselineItem.Data)
+			if err != nil {
+				log.Error("Error merging ConfigMap Data. ", err)
+				return nil
+			}
+			err = mergo.Merge(&overwriteItem.BinaryData, baselineItem.BinaryData)
+			if err != nil {
+				log.Error("Error merging ConfigMap BinaryData. ", err)
+				return nil
+			}
+		}
+	}
+	slice := make([]corev1.ConfigMap, combinedSize(baselineRefs, overwriteRefs))
+	err := mergeObjects(baselineRefs, overwriteRefs, slice)
+	if err != nil {
+		log.Error("Error merging objects. ", err)
+		return nil
+	}
+	return slice
 }
 
 func getConfigMapReferenceSlice(objects []corev1.ConfigMap) []api.OpenShiftObject {

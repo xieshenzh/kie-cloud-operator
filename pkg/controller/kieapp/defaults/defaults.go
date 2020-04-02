@@ -183,12 +183,16 @@ func getEnvTemplate(cr *api.KieApp) (envTemplate api.EnvTemplate, err error) {
 	if err != nil {
 		return envTemplate, err
 	}
+	processMigrationConfig, err := getProcessMigrationTemplate(cr, serversConfig)
+	if err != nil {
+		return envTemplate, err
+	}
 	envTemplate = api.EnvTemplate{
 		CommonConfig:     &cr.Spec.CommonConfig,
 		Console:          getConsoleTemplate(cr),
 		Servers:          serversConfig,
 		SmartRouter:      getSmartRouterTemplate(cr),
-		ProcessMigration: getProcessMigrationTemplate(cr, serversConfig),
+		ProcessMigration: *processMigrationConfig,
 		Constants:        *getTemplateConstants(cr),
 	}
 	if err := configureAuth(cr, &envTemplate); err != nil {
@@ -936,7 +940,7 @@ func setDefaults(cr *api.KieApp) {
 	setPasswords(cr, isTrialEnv)
 }
 
-func getProcessMigrationTemplate(cr *api.KieApp, serversConfig []api.ServerTemplate) api.ProcessMigrationTemplate {
+func getProcessMigrationTemplate(cr *api.KieApp, serversConfig []api.ServerTemplate) (*api.ProcessMigrationTemplate, error) {
 	processMigrationTemplate := api.ProcessMigrationTemplate{}
 	if deployProcessMigration(cr) {
 		if cr.Spec.Objects.ProcessMigration.Image != "" {
@@ -958,11 +962,14 @@ func getProcessMigrationTemplate(cr *api.KieApp, serversConfig []api.ServerTempl
 		}
 		if cr.Spec.Objects.ProcessMigration.Database.Type == "" {
 			processMigrationTemplate.Database.Type = api.DatabaseH2
+		} else if cr.Spec.Objects.ProcessMigration.Database.Type == api.DatabaseExternal &&
+			cr.Spec.Objects.ProcessMigration.Database.ExternalConfig == nil {
+			return nil, fmt.Errorf("external database configuration is mandatory for external database type of process migration")
 		} else {
-			processMigrationTemplate.Database.Type = cr.Spec.Objects.ProcessMigration.Database.Type
+			processMigrationTemplate.Database = *cr.Spec.Objects.ProcessMigration.Database.DeepCopy()
 		}
 	}
-	return processMigrationTemplate
+	return &processMigrationTemplate, nil
 }
 
 func mergeProcessMigration(service kubernetes.PlatformService, cr *api.KieApp, env api.Environment, envTemplate api.EnvTemplate) (api.Environment, error) {

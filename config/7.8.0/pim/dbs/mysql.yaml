@@ -15,12 +15,17 @@ processMigration:
                     ">-
                     replicas=$(oc get dc [[.ApplicationName]]-process-migration-mysql -o=jsonpath='{.status.availableReplicas}'); until '[' $replicas -gt 0 ']'; do echo waiting for [[.ApplicationName]]-process-migration-mysql; replicas=$(oc get dc [[.ApplicationName]]-process-migration-mysql -o=jsonpath='{.status.availableReplicas}'); sleep 2; done;",
                   ]
-                image: registry.redhat.io/openshift3/ose-cli:v3.11
+                image: "[[$.Constants.OseCliImageURL]]"
                 imagePullPolicy: IfNotPresent
                 name: "[[.ApplicationName]]-process-migration-mysql-init"
                 terminationMessagePolicy: FallbackToLogsOnError
-    ## KIE ProcessMigration deployment config END
-    ## MySQL deployment BEGIN
+            containers:
+              - name: "[[.ApplicationName]]-process-migration"
+                env:
+                  - name: JBOSS_KIE_EXTRA_CLASSPATH
+                    value: "/opt/rhpam-process-migration/drivers/mariadb-java-client.jar"
+  ## KIE ProcessMigration deployment config END
+  ## MySQL deployment BEGIN
     - metadata:
         name: "[[.ApplicationName]]-process-migration-mysql"
         labels:
@@ -31,15 +36,6 @@ processMigration:
         strategy:
           type: Recreate
         triggers:
-          - type: ImageChange
-            imageChangeParams:
-              automatic: true
-              containerNames:
-                - "[[.ApplicationName]]-process-migration-mysql"
-              from:
-                kind: ImageStreamTag
-                namespace: "openshift"
-                name: "mysql:5.7"
           - type: ConfigChange
         replicas: 1
         selector:
@@ -56,7 +52,7 @@ processMigration:
             terminationGracePeriodSeconds: 60
             containers:
               - name: "[[.ApplicationName]]-process-migration-mysql"
-                image: mysql
+                image: "[[$.Constants.MySQLImageURL]]"
                 imagePullPolicy: Always
                 livenessProbe:
                   tcpSocket:
@@ -101,6 +97,9 @@ processMigration:
           application: "[[$.ApplicationName]]"
           service: "[[.ApplicationName]]-process-migration-mysql"
       spec:
+        # [[ if ne .ProcessMigration.Database.StorageClassName "" ]]
+        storageClassName: "[[.ProcessMigration.Database.StorageClassName]]"
+        # [[ end ]]
         accessModes:
           - ReadWriteOnce
         resources:
@@ -130,4 +129,25 @@ processMigration:
         annotations:
           description: The MySQL server's port.
   ## MySQL service END
+  ## KIE ProcessMigration ConfigMap BEGIN
+  configMaps:
+    - metadata:
+        name: "[[.ApplicationName]]-process-migration"
+      data:
+        project-overrides.yml: |-
+          kieservers:
+            #[[range $index, $Map := .ProcessMigration.KieServerClients]]
+            - host: [[.Host]]
+              username: [[.Username]]
+              password: [[.Password]]
+            #[[end]]
+          thorntail:
+            datasources:
+              data-sources:
+                pimDS:
+                  driver-name: mariadb
+                  connection-url: jdbc:mariadb://[[.ApplicationName]]-process-migration-mysql:3306/pimdb?useUnicode=true&useSSL=false&serverTimezone=UTC
+                  user-name: pim
+                  password: "[[$.DBPassword]]"
+  ## KIE ProcessMigration ConfigMap END
 ## KIE ProcessMigration END

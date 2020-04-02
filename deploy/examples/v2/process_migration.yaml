@@ -9,3 +9,5 @@ spec:
       image: "rhpam-process-migration-rhel8"
       database:
         type: "postgresql"
+        size: 30Gi
+        storageClassName: gold

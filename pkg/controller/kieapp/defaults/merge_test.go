@@ -478,24 +478,82 @@ func TestMergeDeploymentconfigs_PodSpec_Volumes(t *testing.T) {
 
 func TestMergeConfigMaps(t *testing.T) {
 	baseline := []corev1.ConfigMap{
+		*buildCM("overwrite-cm2",
+			map[string]string{
+				"cm2-data-key-1": "cm2-data-value",
+				"cm2-data-key-2": "cm2-data-value",
+				"cm2-data-key-3": "cm2-data-value",
+			},
+			map[string][]byte{
+				"cm2-binary-data-key": {1, 3, 5, 7, 9},
+			},
+		),
 		*buildCM("cm1",
-			map[string]string{"cm1-data-key": "cm1-data-value"},
-			map[string][]byte{"cm1-binary-data-key": {1, 2, 3, 4, 5}}),
+			map[string]string{
+				"cm1-data-key": "cm1-data-value",
+			},
+			map[string][]byte{
+				"cm1-binary-data-key-1": {1, 2, 3, 4, 5},
+				"cm1-binary-data-key-2": {1, 2, 3, 4, 5},
+				"cm1-binary-data-key-3": {1, 2, 3, 4, 5},
+			},
+		),
 	}
 
 	overwrite := []corev1.ConfigMap{
 		*buildCM("overwrite-cm2",
-			map[string]string{"cm2-data-key": "cm2-data-value"},
-			map[string][]byte{"cm2-binary-data-key": {1, 3, 5, 7, 9}}),
+			map[string]string{
+				"cm2-data-key-1": "cm2-data-value",
+				"cm2-data-key-2": "cm2-data-value-2",
+				"cm2-data-key-4": "cm2-data-value-3",
+			},
+			map[string][]byte{
+				"cm2-binary-data-key": {1, 3, 5, 7, 9},
+			},
+		),
 		*buildCM("cm1",
-			map[string]string{"cm1-data-key": "cm1-data-value-overwrite"},
-			map[string][]byte{"cm1-binary-data-key": {6, 7, 8, 9, 0}}),
+			map[string]string{
+				"cm1-data-key": "cm1-data-value-overwrite",
+			},
+			map[string][]byte{
+				"cm1-binary-data-key-1": {1, 2, 3, 4, 5},
+				"cm1-binary-data-key-2": {6, 7, 8, 9, 0},
+				"cm1-binary-data-key-4": {1, 2, 3, 4, 5},
+			},
+		),
 	}
 	results := mergeConfigMaps(baseline, overwrite)
 
+	expected := []corev1.ConfigMap{
+		*buildCM("overwrite-cm2",
+			map[string]string{
+				"cm2-data-key-1": "cm2-data-value",
+				"cm2-data-key-2": "cm2-data-value-2",
+				"cm2-data-key-3": "cm2-data-value",
+				"cm2-data-key-4": "cm2-data-value-3",
+			},
+			map[string][]byte{
+				"cm2-binary-data-key": {1, 3, 5, 7, 9},
+			},
+		),
+		*buildCM("cm1",
+			map[string]string{
+				"cm1-data-key": "cm1-data-value-overwrite",
+			},
+			map[string][]byte{
+				"cm1-binary-data-key-1": {1, 2, 3, 4, 5},
+				"cm1-binary-data-key-2": {6, 7, 8, 9, 0},
+				"cm1-binary-data-key-3": {1, 2, 3, 4, 5},
+				"cm1-binary-data-key-4": {1, 2, 3, 4, 5},
+			},
+		),
+	}
+
 	assert.Equal(t, 2, len(results))
-	assert.Equal(t, overwrite[0], results[1])
-	assert.Equal(t, overwrite[1], results[0])
+	assert.Equal(t, expected[0].Data, results[0].Data)
+	assert.Equal(t, expected[0].BinaryData, results[0].BinaryData)
+	assert.Equal(t, expected[1].Data, results[1].Data)
+	assert.Equal(t, expected[1].BinaryData, results[1].BinaryData)
 }
 
 func getParsedTemplate(filename string, name string, object interface{}) error {

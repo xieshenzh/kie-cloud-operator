@@ -3112,9 +3112,10 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 		serversConfig []api.ServerTemplate
 	}
 	tests := []struct {
-		name string
-		args args
-		want api.ProcessMigrationTemplate
+		name    string
+		args    args
+		want    *api.ProcessMigrationTemplate
+		wantErr bool
 	}{
 		{
 			"ProcessMigration_Custom",
@@ -3127,7 +3128,9 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 								Image:    "test-pim-image",
 								ImageTag: "test-pim-image-tag",
 								Database: api.DatabaseObject{
-									Type: api.DatabaseMySQL,
+									Type:             api.DatabaseMySQL,
+									StorageClassName: "gold",
+									Size:             "32Gi",
 								},
 							},
 						},
@@ -3143,7 +3146,7 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 					{KieName: "kieserver2"},
 				},
 			},
-			api.ProcessMigrationTemplate{
+			&api.ProcessMigrationTemplate{
 				Image:    "test-pim-image",
 				ImageTag: "test-pim-image-tag",
 				KieServerClients: []api.KieServerClient{
@@ -3159,9 +3162,12 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 					},
 				},
 				Database: api.DatabaseObject{
-					Type: api.DatabaseMySQL,
+					Type:             api.DatabaseMySQL,
+					StorageClassName: "gold",
+					Size:             "32Gi",
 				},
 			},
+			false,
 		},
 		{
 			"ProcessMigration_Default",
@@ -3183,7 +3189,7 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 					{KieName: "kieserver1"},
 				},
 			},
-			api.ProcessMigrationTemplate{
+			&api.ProcessMigrationTemplate{
 				Image:    "rhpam-process-migration-rhel8",
 				ImageTag: "test",
 				KieServerClients: []api.KieServerClient{
@@ -3197,6 +3203,7 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 					Type: api.DatabaseH2,
 				},
 			},
+			false,
 		},
 		{
 			"ProcessMigration_Empty",
@@ -3215,12 +3222,119 @@ func TestGetProcessMigrationTemplate(t *testing.T) {
 					{KieName: "kieserver1"},
 				},
 			},
-			api.ProcessMigrationTemplate{},
+			&api.ProcessMigrationTemplate{},
+			false,
+		},
+		{
+			"ProcessMigration_ExternalDB_Error",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamTrial,
+						Objects: api.KieAppObjects{
+							ProcessMigration: &api.ProcessMigrationObject{
+								Image:    "test-pim-image",
+								ImageTag: "test-pim-image-tag",
+								Database: api.DatabaseObject{
+									Type: api.DatabaseExternal,
+								},
+							},
+						},
+						CommonConfig: api.CommonConfig{
+							AdminUser:     "testuser",
+							AdminPassword: "testpassword",
+						},
+						Version: "test",
+					},
+				},
+				[]api.ServerTemplate{
+					{KieName: "kieserver1"},
+					{KieName: "kieserver2"},
+				},
+			},
+			nil,
+			true,
+		},
+		{
+			"ProcessMigration_ExternalDB",
+			args{
+				&api.KieApp{
+					Spec: api.KieAppSpec{
+						Environment: api.RhpamTrial,
+						Objects: api.KieAppObjects{
+							ProcessMigration: &api.ProcessMigrationObject{
+								Image:    "test-pim-image",
+								ImageTag: "test-pim-image-tag",
+								Database: api.DatabaseObject{
+									Type: api.DatabaseExternal,
+									ExternalConfig: &api.ExternalDatabaseObject{
+										Driver:                     "mariadb",
+										JdbcURL:                    "jdbc:mariadb://hello-mariadb:3306/pimdb",
+										Username:                   "pim",
+										Password:                   "pim",
+										MinPoolSize:                "10",
+										MaxPoolSize:                "10",
+										ConnectionChecker:          "org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker",
+										ExceptionSorter:            "org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter",
+										BackgroundValidation:       "true",
+										BackgroundValidationMillis: "150000",
+									},
+								},
+							},
+						},
+						CommonConfig: api.CommonConfig{
+							AdminUser:     "testuser",
+							AdminPassword: "testpassword",
+						},
+						Version: "test",
+					},
+				},
+				[]api.ServerTemplate{
+					{KieName: "kieserver1"},
+					{KieName: "kieserver2"},
+				},
+			},
+			&api.ProcessMigrationTemplate{
+				Image:    "test-pim-image",
+				ImageTag: "test-pim-image-tag",
+				KieServerClients: []api.KieServerClient{
+					{
+						Host:     "http://kieserver1:8080/services/rest/server",
+						Username: "testuser",
+						Password: "testpassword",
+					},
+					{
+						Host:     "http://kieserver2:8080/services/rest/server",
+						Username: "testuser",
+						Password: "testpassword",
+					},
+				},
+				Database: api.DatabaseObject{
+					Type: api.DatabaseExternal,
+					ExternalConfig: &api.ExternalDatabaseObject{
+						Driver:                     "mariadb",
+						JdbcURL:                    "jdbc:mariadb://hello-mariadb:3306/pimdb",
+						Username:                   "pim",
+						Password:                   "pim",
+						MinPoolSize:                "10",
+						MaxPoolSize:                "10",
+						ConnectionChecker:          "org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker",
+						ExceptionSorter:            "org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter",
+						BackgroundValidation:       "true",
+						BackgroundValidationMillis: "150000",
+					},
+				},
+			},
+			false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getProcessMigrationTemplate(tt.args.cr, tt.args.serversConfig); !reflect.DeepEqual(got, tt.want) {
+			got, err := getProcessMigrationTemplate(tt.args.cr, tt.args.serversConfig)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getProcessMigrationTemplate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			} else if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getProcessMigrationTemplate() = %v, want %v", got, tt.want)
 			}
 		})
